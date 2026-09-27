@@ -462,7 +462,10 @@ tip.list:SetJustifyH("LEFT")
 tip.legend = tip:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 tip.legend:SetPoint("BOTTOMLEFT", 10, 8)
 local function colorCode(c)
-    return ("|cff%02x%02x%02x"):format(c[1] * 255, c[2] * 255, c[3] * 255)
+    -- Round to whole numbers: %x needs integers (Lua 5.1 truncates silently,
+    -- newer Lua versions refuse), and rounding is more accurate anyway.
+    local function byte(v) return math.floor(v * 255 + 0.5) end
+    return ("|cff%02x%02x%02x"):format(byte(c[1]), byte(c[2]), byte(c[3]))
 end
 tip.legend:SetText(
     colorCode(COLORS.same) .. "same|r   "

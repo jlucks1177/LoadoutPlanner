@@ -60,6 +60,9 @@ jobs:
       - name: Check the data file loads
         run: luac5.1 -p Data/Builtin.lua
 
+      - name: Test the addon with today's builds
+        run: lua5.1 tools/test/run.lua
+
       - name: Did the builds change?
         id: diff
         run: |

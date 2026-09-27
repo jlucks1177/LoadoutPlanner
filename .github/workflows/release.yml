@@ -30,6 +30,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Lua 5.1
+        run: sudo apt-get update -q && sudo apt-get install -y -q lua5.1
+
+      # A broken addon never reaches players: if a test fails, the job
+      # stops here, before anything is packaged or uploaded.
+      - name: Test the addon
+        run: lua5.1 tools/test/run.lua
+
       - name: Project IDs for CurseForge and Wago
         id: ids
         run: |

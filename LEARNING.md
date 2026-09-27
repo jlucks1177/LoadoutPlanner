@@ -1207,3 +1207,66 @@ texture:SetTexCoord(start, start + span, top, bottom)
 
 > **Exercise:** add a slider to the options menu that controls how dark the painting is (the `SetVertexColor` values in `Style.AddSpecArt`).
 
+---
+
+# Part 19: v0.18.1 (tests that live in the repo)
+
+## 📌 84. What changed
+
+- **Top builds opens on a source that has data.** If your saved choice was Raider.IO (which isn't included yet), the panel used to open on an empty page. Now it falls back to parses.gg, and remembers your choice for when Raider.IO arrives. Clicking Raider.IO yourself still shows why it's empty.
+- **The tests moved into the repo** (`tools/test/`) and **GitHub runs them**: on every push (`ci.yml`, a new "Checks" workflow), and before every release. A failing test stops the release before anything is uploaded.
+- **CLAUDE.md**: notes that Claude Code reads automatically when you work on the repo in VS Code: the project's rules, layout, tests and release steps.
+
+---
+
+## 🔹 85. Testing an addon without the game
+
+WoW addons normally only run inside WoW. But a Lua file is just Lua: what it needs from the game is a set of **globals** (`CreateFrame`, `C_Traits`, `UIParent`...). Provide fake versions of those, and the real addon files load and run in plain Lua. That's `tools/test/wow.lua`.
+
+The main trick keeps the fake small. Every fake frame answers **any** capitalized method call, and does nothing:
+
+```lua
+setmetatable(o, { __index = function(_, k)
+    if not k:match("^%u") then return nil end   -- fields stay nil
+    return function(self, ...) ... end           -- SetPoint, SetAtlas, ...: accepted
+end })
+```
+
+`__index` is the function Lua calls when a key is missing from a table, so `frame:SetPoint(...)` finds a do-nothing function without us listing all 200 frame methods. Only the few that must *behave* (Show/Hide firing OnShow, SetText remembering its text, SetScript storing handlers) have real code.
+
+What these tests can and can't tell you:
+
+| Catches | Can't catch |
+|---|---|
+| Typos and syntax errors | Anything visual: layout, overlap, art |
+| A file using something defined later in the TOC | Real API behavior (the fakes return what we tell them) |
+| Logic errors (wrong source chosen, missing rows) | Taint, combat restrictions |
+| Crashes when Blizzard art or templates are missing | |
+
+So tests and in-game checks complement each other. Tests catch mistakes in seconds, every time. The game catches what only the game can show.
+
+---
+
+## 🔹 86. A test must be able to fail
+
+My first version of the new Top builds test **passed even with the bug put back in**. It checked that the header mentioned "parses.gg", but the Raider.IO message says "…Or use parses.gg." too. The test could never fail.
+
+The habit that caught it: after writing a test for a fix, **undo the fix and run the test again**. If it still passes, it isn't testing anything. The fixed test now looks for "Most-played builds from parses.gg", which only the real header contains.
+
+---
+
+## 🔹 87. Continuous integration (CI)
+
+`ci.yml` is the exercise from section 79, done:
+
+```yaml
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['Data/Builtin.lua']   # the daily job tests its own commits
+```
+
+Every push runs the addon tests and the sync tool's tests on a fresh Linux machine. The result shows as a ✓ or ✗ next to the commit on GitHub. `release.yml` runs the same tests **before** the packager, so a red test means no release. That's the safety net that lets you ship quickly.
+
+> **Exercise:** add a test to `test_load.lua` that runs `/lp toggle` twice and checks the window is shown again afterwards. Then break `ns.SetWindowCollapsed` on purpose and make sure your test fails.
+

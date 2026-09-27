@@ -2,7 +2,7 @@
 
 A World of Warcraft addon (Retail, Midnight 12.1) for managing talent builds. It adds a panel to the talent window where you can keep an unlimited library of builds organized into groups, switch specs and builds with one click, compare any build against your current talents, browse the most-played builds for your spec per dungeon and raid boss (with Archon links), and tag builds to dungeons, raids, and bosses (optionally per difficulty) from anywhere, so the right one is offered when you zone in.
 
-**Version:** 0.18.0 · **Author:** Joe · **Game version:** 12.1 (`## Interface: 120100`)
+**Version:** 0.18.1 · **Author:** Joe · **Game version:** 12.1 (`## Interface: 120100`)
 
 For a guided tour of the source code, written as a tutorial, see **LEARNING.md**. This README covers what the addon does and how it works.
 
@@ -394,6 +394,10 @@ Top builds are matched to the Encounter Journal **by name**. If your game langua
 ---
 
 ## 14. How it works
+
+### Tests
+
+`lua tools/test/run.lua` (from the repository root, any Lua 5.1 or newer) loads every file against a fake WoW API and checks the main windows and the Top builds panel. GitHub runs it on every push (`ci.yml`) and before every release, so a broken build never reaches players. See `tools/test/` and LEARNING.md Part 19.
 
 ### File map
 

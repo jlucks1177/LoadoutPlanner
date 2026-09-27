@@ -121,7 +121,7 @@ Personal use of Raider.IO's API is fine, but publishing its data to every player
 
 **Releasing your own code changes:**
 
-1. Change the addon, and test it in game.
+1. `git pull`, change the addon, run the tests (`lua tools/test/run.lua`), and test it in game.
 2. Put the new version number in the `VERSION` file (e.g. `0.18.0`).
 3. Commit, tag, push:
 

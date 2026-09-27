@@ -1,0 +1,38 @@
+# Checks
+# Runs the tests on every push and pull request, so a mistake shows up
+# as a red X on the commit long before you tag a release. Publishes nothing.
+
+name: Checks
+
+on:
+  push:
+    branches: ['**']
+    # The daily job's own data commits are tested inside that job already.
+    paths-ignore:
+      - 'Data/Builtin.lua'
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Install Lua 5.1 (the version WoW uses)
+        run: sudo apt-get update -q && sudo apt-get install -y -q lua5.1
+
+      - name: Test the addon
+        run: lua5.1 tools/test/run.lua
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test the sync tool
+        working-directory: tools/sync
+        run: npm test
