@@ -1,0 +1,44 @@
+# Release
+# Publishes a new version when YOU push a version tag, e.g. after changing
+# the addon's code:
+#     git tag -a v0.18.0 -m "v0.18.0"
+#     git push origin v0.18.0
+# (Also update the VERSION file to 0.18.0, so the daily data releases
+#  continue from the new version: v0.18.0.20261001, ...)
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Project IDs for CurseForge and Wago
+        id: ids
+        run: |
+          args=""
+          if [ -n "${{ vars.CURSEFORGE_PROJECT_ID }}" ]; then args="$args -p ${{ vars.CURSEFORGE_PROJECT_ID }}"; fi
+          if [ -n "${{ vars.WAGO_PROJECT_ID }}" ]; then args="$args -a ${{ vars.WAGO_PROJECT_ID }}"; fi
+          echo "args=$args" >> "$GITHUB_OUTPUT"
+
+      - name: Package and release
+        uses: BigWigsMods/packager@v2
+        with:
+          args: ${{ steps.ids.outputs.args }}

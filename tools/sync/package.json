@@ -1,0 +1,14 @@
+{
+  "name": "loadoutplanner-sync",
+  "version": "1.0.0",
+  "description": "Builds LoadoutPlanner's Top builds data from the official Raider.IO API.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "bin": { "loadoutplanner-sync": "src/sync.js" },
+  "scripts": {
+    "sync": "node src/sync.js",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

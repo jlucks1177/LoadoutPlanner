@@ -1,0 +1,10 @@
+{
+  "apiKey": "PASTE-YOUR-RAIDER-IO-KEY-HERE",
+  "addonsPath": "C:\\Program Files (x86)\\World of Warcraft\\_retail_\\Interface\\AddOns",
+  "region": "world",
+  "mythicPlusPages": 5,
+  "raidGuilds": 20,
+  "raidDifficulties": ["mythic", "heroic"],
+  "minSamples": 3,
+  "requestDelayMs": 1000
+}

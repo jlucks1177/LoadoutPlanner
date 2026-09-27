@@ -1,0 +1,9 @@
+# Packaging instructions for the BigWigs packager (used by the GitHub Actions).
+# Everything in the repository goes into the addon zip EXCEPT what's listed here.
+package-as: LoadoutPlanner
+
+ignore:
+  - tools
+  - LEARNING.md
+  - PUBLISHING.md
+  - VERSION

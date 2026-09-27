@@ -1,0 +1,105 @@
+# Daily builds
+# Every morning: fetch the most-played talent builds, put them inside the
+# addon (Data/Builtin.lua), and if anything changed, publish a new release to
+# GitHub, CurseForge and Wago. Players get the new builds through their
+# addon manager with no setup of their own.
+#
+# Also runnable by hand: Actions tab -> "Daily builds" -> "Run workflow".
+
+name: Daily builds
+
+on:
+  schedule:
+    - cron: '17 11 * * *' # 11:17 UTC = 6:17 AM US Central (5:17 AM in winter)
+  workflow_dispatch:
+
+permissions:
+  contents: write # commit the new data, push the tag, create the GitHub release
+
+concurrency:
+  group: daily-builds # never two runs at once
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      # Upload tokens (Settings -> Secrets and variables -> Actions -> Secrets).
+      # A missing token just skips that site.
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history, for the changelog
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Lua 5.1 (to check the generated file)
+        run: sudo apt-get update -q && sudo apt-get install -y -q lua5.1
+
+      - name: Test the sync tool
+        working-directory: tools/sync
+        run: npm test
+
+      - name: Fetch today's builds
+        working-directory: tools/sync
+        env:
+          # Raider.IO data is only included once you set the repository
+          # variable INCLUDE_RAIDERIO to true (after Raider.IO says yes).
+          RAIDERIO_API_KEY: ${{ secrets.RAIDERIO_API_KEY }}
+          SOURCES: ${{ vars.INCLUDE_RAIDERIO == 'true' && 'parses,raiderio' || 'parses' }}
+        run: node src/sync.js --bundle "$GITHUB_WORKSPACE" --sources "$SOURCES"
+
+      - name: Check the data file loads
+        run: luac5.1 -p Data/Builtin.lua
+
+      - name: Did the builds change?
+        id: diff
+        run: |
+          if git diff --quiet -- Data/Builtin.lua; then
+            echo "No build changes today; nothing to publish."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and tag the new version
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          base="$(tr -d '[:space:]' < VERSION)"
+          tag="v${base}.$(date -u +%Y%m%d)"
+          # A second run on the same day gets a time suffix.
+          if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+            tag="${tag}.$(date -u +%H%M)"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Data/Builtin.lua
+          git commit -m "Daily builds $(date -u +%Y-%m-%d)"
+          git tag -a "$tag" -m "Daily talent builds $(date -u +%Y-%m-%d)"
+          git push origin HEAD "$tag"
+          echo "Tagged $tag"
+
+      - name: Project IDs for CurseForge and Wago
+        if: steps.diff.outputs.changed == 'true'
+        id: ids
+        run: |
+          args=""
+          if [ -n "${{ vars.CURSEFORGE_PROJECT_ID }}" ]; then args="$args -p ${{ vars.CURSEFORGE_PROJECT_ID }}"; fi
+          if [ -n "${{ vars.WAGO_PROJECT_ID }}" ]; then args="$args -a ${{ vars.WAGO_PROJECT_ID }}"; fi
+          echo "args=$args" >> "$GITHUB_OUTPUT"
+
+      # Tags pushed by this workflow don't start other workflows (a GitHub
+      # rule), so the release is built right here.
+      - name: Package and release
+        if: steps.diff.outputs.changed == 'true'
+        uses: BigWigsMods/packager@v2
+        with:
+          args: ${{ steps.ids.outputs.args }}

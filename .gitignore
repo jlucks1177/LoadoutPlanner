@@ -1,0 +1,7 @@
+# Your personal sync settings (contains your API key) and its caches
+tools/sync/config.json
+tools/sync/.cache/
+tools/sync/output/
+node_modules/
+.DS_Store
+Thumbs.db

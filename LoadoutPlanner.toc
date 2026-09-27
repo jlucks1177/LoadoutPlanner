@@ -1,0 +1,31 @@
+## Interface: 120100
+## Title: LoadoutPlanner
+## Notes: Tag talent loadouts to dungeons and raid bosses, and get offered the right build at the right time.
+## Author: Joe
+## Version: @project-version@
+## OptionalDeps: LoadoutPlannerData, ArchonTalentsData, PeaversTalentsData
+## SavedVariables: LoadoutPlannerBuilds
+## SavedVariablesPerCharacter: LoadoutPlannerDB
+
+# Load order matters: each file can use what the files above it defined.
+Data\Builtin.lua
+Core.lua
+Style.lua
+Loadouts.lua
+Data.lua
+Builds.lua
+ImportTLE.lua
+Import.lua
+Journal.lua
+Context.lua
+Prompt.lua
+Diff.lua
+Background.lua
+SpecBar.lua
+IconPicker.lua
+Editor.lua
+Window.lua
+TagPanel.lua
+Archon.lua
+TopBuilds.lua
+UI.lua
