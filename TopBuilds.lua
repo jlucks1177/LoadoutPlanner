@@ -195,10 +195,16 @@ local SOURCES = {
 local SOURCE_BY_KEY = {}
 for _, source in ipairs(SOURCES) do SOURCE_BY_KEY[source.key] = source end
 
--- The chosen source: your last choice, else the first one installed.
+-- The chosen source: your last choice if it has data, else the first one
+-- that does. (A saved choice with no data, like Raider.IO before it's
+-- included, would otherwise greet you with an empty panel.) Your saved
+-- choice isn't overwritten, so it comes back once that source has data.
+-- A source you click this session is always shown, so clicking Raider.IO
+-- still explains why it's empty.
+local clickedThisSession
 local function currentSource()
     local chosen = ns.db and SOURCE_BY_KEY[ns.db.topSource or ""]
-    if chosen then return chosen end
+    if chosen and (chosen.available() or chosen.key == clickedThisSession) then return chosen end
     for _, source in ipairs(SOURCES) do
         if source.available() then return source end
     end
@@ -319,6 +325,7 @@ for i = #SOURCES, 1, -1 do -- laid out right to left
     button:SetText(source.text)
     button:SetScript("OnClick", function()
         ns.db.topSource = source.key
+        clickedThisSession = source.key
         refresh()
     end)
     sourceButtons[i] = button
