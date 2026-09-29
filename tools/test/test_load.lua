@@ -56,6 +56,16 @@ ok, err = pcall(SlashCmdList.LOADOUTPLANNER, "top")
 wow.check(ok, "/lp top runs" .. (ok and "" or (": " .. tostring(err))))
 wow.check(_G.LoadoutPlannerTopBuilds and _G.LoadoutPlannerTopBuilds.shown, "Top builds panel opens")
 
+-- The build editor (Import button): opens, and its icon grid draws.
+ok, err = pcall(ns.OpenEditor, {})
+wow.check(ok, "build editor opens" .. (ok and "" or (": " .. tostring(err))))
+wow.check(_G.LoadoutPlannerEditor and _G.LoadoutPlannerEditor.shown, "build editor is shown")
+local lit = 0
+for _, o in ipairs(wow.created) do
+    if o.isSelectedTab then lit = lit + 1 end
+end
+wow.check(lit >= 1, "the chosen Top builds tab shows as selected")
+
 if mode == "missing" then
     wow.check((wow.templates.BackdropTemplate or 0) > 1, "falls back to plain frames when templates are gone")
 end

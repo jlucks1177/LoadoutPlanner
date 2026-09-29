@@ -110,8 +110,13 @@ end
 --      inside, and talents lock once it starts, so walking in (on any
 --      difficulty) is the only moment a Mythic+ build can be offered
 --   3. the instance, any difficulty
---   4. "All dungeons" / "All raids" tags (same difficulty rules)
---   5. its bosses (skipping ones already killed, if asked to)
+--   4. DUNGEONS ONLY: the instance's tags for every other difficulty too.
+--      Being in a dungeon at all is enough to be offered its builds (since
+--      v0.19); the difficulty only decides the order.
+--   5. "All dungeons" / "All raids" tags (same rules)
+--   6. its bosses (skipping ones already killed, if asked to)
+-- Raids stay strict about difficulty: a Mythic raid build is rarely right
+-- on Normal, and raid difficulty is set before you zone in.
 -- specTable defaults to your current spec. For OTHER specs, items can't
 -- be resolved (Blizzard loadouts belong to a spec), so only `ref` is set.
 function ns.GetCandidates(instance, skipKilled, specTable)
@@ -145,6 +150,12 @@ function ns.GetCandidates(instance, skipKilled, specTable)
         add(tagFor(MYTHIC_PLUS), "Mythic+")
     end
     add(tagFor(nil), "Any difficulty")
+    local isDungeon = instance.type == "party"
+    if isDungeon then
+        for _, other in ipairs(ns.DIFFICULTIES.party) do
+            add(tagFor(other.id), other.name .. " tag")
+        end
+    end
 
     -- 4. "All dungeons" / "All raids" tags, with the same difficulty rules:
     --    exact difficulty, then (dungeons) Mythic+, then any difficulty.
@@ -164,6 +175,11 @@ function ns.GetCandidates(instance, skipKilled, specTable)
             add(categoryTag(MYTHIC_PLUS), category.label .. ", Mythic+")
         end
         add(categoryTag(nil), category.label .. ", any difficulty")
+        if isDungeon then
+            for _, other in ipairs(ns.DIFFICULTIES.party) do
+                add(categoryTag(other.id), ("%s, %s tag"):format(category.label, other.name))
+            end
+        end
     end
 
     -- Reading bosses touches the Encounter Journal; if that fails for any
@@ -224,6 +240,9 @@ function ns.CheckContext(attempt)
         ns.HideZonePrompt()
         return
     end
+    -- Move any old "Keystone Dungeons" tags to "All dungeons" (Data.lua)
+    -- before we look for tags here. Cheap, and does nothing once done.
+    pcall(function() ns.MigratePseudoTags((ns.GetSeason() or {}).skipped) end)
     local key = ns.TagKey(instance.id, instance.difficulty)
     if key == promptedKey or keystoneRunning() then
         return
@@ -232,14 +251,18 @@ function ns.CheckContext(attempt)
         return -- PLAYER_REGEN_ENABLED checks again (see the bottom of this file)
     end
 
+    -- Only builds tagged in the spec you're IN are ever offered: tags are
+    -- per spec, and GetCandidates reads only this spec's tags.
     local candidates = ns.GetCandidates(instance, true)
     if #candidates == 0 then
         promptedKey = key
-        -- Nothing for THIS spec, but maybe for another one: say so, and
-        -- offer to switch. (Switching spec re-runs this check.)
-        local others = ns.GetOtherSpecMatches(instance)
-        if #others > 0 then
-            ns.ShowSpecPrompt(instance, others)
+        -- Optional (off by default since v0.19): if another spec has builds
+        -- tagged here, offer to switch spec. Switching re-runs this check.
+        if ns.db and ns.db.promptOtherSpecs then
+            local others = ns.GetOtherSpecMatches(instance)
+            if #others > 0 then
+                ns.ShowSpecPrompt(instance, others)
+            end
         end
         return
     end
@@ -334,6 +357,21 @@ ns.commands.why = function()
         print(("  %s -> %s: %s"):format(candidate.label, candidate.item.name,
             matches == nil and "can't compare yet" or (matches and "you already have it" or "different from your talents")))
     end
+end
+
+-- /lp journal: what the Encounter Journal gives us this season, including
+-- the pages we leave out (world bosses, "Keystone Dungeons").
+ns.commands.journal = function()
+    local season = ns.GetSeason(true)
+    ns.Print(("Encounter Journal tier: %s"):format(tostring(season.tierName)))
+    local function show(entry, note)
+        print(("  %s %s | map %s | shows difficulty %s | %d bosses%s"):format(
+            entry.isRaid and "[raid]" or "[dungeon]", tostring(entry.name), tostring(entry.mapID),
+            tostring(entry.showsDifficulty), entry.bossCount or #entry.bosses, note or ""))
+    end
+    for _, raid in ipairs(season.raids) do show(raid) end
+    for _, dungeon in ipairs(season.dungeons) do show(dungeon) end
+    for _, entry in ipairs(season.skipped) do show(entry, " |cffff8040(left out)|r") end
 end
 
 ns.commands.prompt = function()

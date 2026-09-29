@@ -1,7 +1,7 @@
 -- TopBuilds.lua
 -- "Top builds": the most-played build for your spec on each of this
--- season's dungeons and raid bosses, from a data addon, plus an Archon
--- link for each (see Archon.lua).
+-- season's dungeons and raid bosses, plus a link to the site each build
+-- comes from (and, in the right-click menu, Archon; see Archon.lua).
 --
 -- Where the builds come from: addons can't use the internet, so build data
 -- has to arrive as ANOTHER addon full of Lua tables, updated outside the
@@ -31,8 +31,8 @@
 
 local addonName, ns = ...
 
-local WIDTH, HEIGHT = 420, 540
-local ROW_HEIGHT = 40
+local WIDTH, HEIGHT = 420, 560
+local ROW_HEIGHT = 44 -- same rows as the main window's list
 
 -- The five tabs, in display order. `difficulty` is our difficulty ID
 -- (Journal.lua), used for tagging and the Archon link.
@@ -139,6 +139,7 @@ local function convertEntries(entries, category, updated, out)
                 updated = updated,
                 share = tonumber(top.share),
                 samples = tonumber(entry.samples),
+                cohort = entry.cohort, -- parses.gg: "top10" or "all" players
                 alternatives = alternatives,
             })
         end
@@ -186,12 +187,67 @@ local function parsesBuilds(specID)
     return (ok and type(builds) == "table") and builds or {}
 end
 
--- The sources, in the order their buttons appear.
-local SOURCES = {
-    { key = "raiderio", text = "Raider.IO", read = raiderioBuilds, available = function() return raiderioData() ~= nil end },
-    { key = "parses", text = "parses.gg", read = parsesBuilds,
-        available = function() return builtin("parses") ~= nil or dataAPI() ~= nil end },
+-- Raider.IO's page for each spec: https://raider.io/specs/<slug>/talents.
+-- (These slugs are the site's own, keyed by the game's spec IDs.)
+local RAIDERIO_SLUGS = {
+    [62] = "arcane-mage", [63] = "fire-mage", [64] = "frost-mage",
+    [65] = "holy-paladin", [66] = "protection-paladin", [70] = "retribution-paladin",
+    [71] = "arms-warrior", [72] = "fury-warrior", [73] = "protection-warrior",
+    [102] = "balance-druid", [103] = "feral-druid", [104] = "guardian-druid", [105] = "restoration-druid",
+    [250] = "blood-death-knight", [251] = "frost-death-knight", [252] = "unholy-death-knight",
+    [253] = "beast-mastery-hunter", [254] = "marksmanship-hunter", [255] = "survival-hunter",
+    [256] = "discipline-priest", [257] = "holy-priest", [258] = "shadow-priest",
+    [259] = "assassination-rogue", [260] = "outlaw-rogue", [261] = "subtlety-rogue",
+    [262] = "elemental-shaman", [263] = "enhancement-shaman", [264] = "restoration-shaman",
+    [265] = "affliction-warlock", [266] = "demonology-warlock", [267] = "destruction-warlock",
+    [268] = "brewmaster-monk", [269] = "windwalker-monk", [270] = "mistweaver-monk",
+    [577] = "havoc-demon-hunter", [581] = "vengeance-demon-hunter", [1480] = "devourer-demon-hunter",
+    [1467] = "devastation-evoker", [1468] = "preservation-evoker", [1473] = "augmentation-evoker",
 }
+
+-- The sources, in the order their buttons appear. `link` is the web page
+-- the builds come from, shown by each row's link button.
+-- parses.gg: its builds pages don't have addresses we can build (the site
+-- is a single-page app), so we link the site itself.
+local SOURCES = {
+    { key = "raiderio", text = "Raider.IO", read = raiderioBuilds,
+        available = function() return raiderioData() ~= nil end,
+        link = function(specID)
+            local slug = RAIDERIO_SLUGS[specID]
+            return slug and ("https://raider.io/specs/%s/talents"):format(slug) or "https://raider.io"
+        end },
+    { key = "parses", text = "parses.gg", read = parsesBuilds,
+        available = function() return builtin("parses") ~= nil or dataAPI() ~= nil end,
+        link = function() return "https://parses.gg" end },
+}
+
+-- A copyable link. WoW can't open a web browser, so the link goes in a
+-- text box you copy from (Ctrl+C) and paste into your browser.
+StaticPopupDialogs.LOADOUTPLANNER_LINK = {
+    text = "%s\n|cffaaaaaaCtrl+C to copy, then paste it into your web browser.|r",
+    button1 = CLOSE, hasEditBox = true, editBoxWidth = 320,
+    timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+    OnShow = function(dialog, data)
+        data = data or dialog.data
+        local box = (dialog.GetEditBox and dialog:GetEditBox()) or dialog.editBox or dialog.EditBox
+        if box and data then
+            box:SetText(data.url)
+            box:HighlightText()
+            box:SetFocus()
+            -- Typing can't change the link: put it back and re-select it.
+            box:SetScript("OnTextChanged", function(self, userInput)
+                if userInput then
+                    self:SetText(data.url)
+                    self:HighlightText()
+                end
+            end)
+        end
+    end,
+}
+
+function ns.ShowLink(title, url)
+    StaticPopup_Show("LOADOUTPLANNER_LINK", title, nil, { url = url })
+end
 local SOURCE_BY_KEY = {}
 for _, source in ipairs(SOURCES) do SOURCE_BY_KEY[source.key] = source end
 
@@ -257,6 +313,7 @@ local function buildRows(tab, specID, byCategory)
             updated = b and b.updated,
             share = b and b.share,
             samples = b and b.samples,
+            cohort = b and b.cohort,
             alternatives = b and b.alternatives,
         })
     end
@@ -300,25 +357,73 @@ end
 ------------------------------------------------------------------------
 -- The panel
 ------------------------------------------------------------------------
--- Blizzard's metal-bordered panel with a title bar (Style.lua).
+-- Blizzard's metal-bordered panel with a title bar (Style.lua), laid out
+-- like the main window: spec painting behind, the list in the middle, and
+-- the talent window's bottom bar holding the hint and source buttons.
 local panel = ns.Style.CreatePanel("LoadoutPlannerTopBuilds", UIParent)
 panel:SetSize(WIDTH, HEIGHT)
 panel:SetFrameStrata("FULLSCREEN")
 panel:EnableMouse(true)
 panel:SetClampedToScreen(true)
+ns.Style.MakeMovable(panel)
 panel:Hide()
 table.insert(UISpecialFrames, "LoadoutPlannerTopBuilds")
+-- solid: it opens over the talent tree, which showed through.
+ns.Style.AddSpecArt(panel, { solid = true })
 
+local PAD = 12
+local LIST_BOTTOM = 68 -- above the bottom-bar art (60px), as in the main window
 
--- Source buttons, right under the title bar: which data the list shows.
+-- Header line: where the builds come from and how fresh they are.
+panel.source = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+panel.source:SetPoint("TOPLEFT", PAD + 2, -32)
+panel.source:SetPoint("RIGHT", -PAD - 2, 0)
+panel.source:SetHeight(28)
+panel.source:SetJustifyH("LEFT")
+panel.source:SetJustifyV("TOP")
+
+-- Tabs: one per difficulty, filling the row. The chosen one stays lit.
 local refresh -- defined below
+local selectedTab = "mythic"
+local tabButtons, tabList = {}, {}
+
+for _, tab in ipairs(TABS) do
+    local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    button:SetHeight(22)
+    button:SetText(tab.text)
+    button:SetScript("OnClick", function()
+        selectedTab = tab.key
+        refresh()
+    end)
+    tabButtons[tab.key] = button
+    table.insert(tabList, button)
+end
+ns.Style.LayoutButtonRow(tabList, panel, PAD, -64, WIDTH - 2 * PAD, 4)
+
+local scroll = ns.Style.CreateScrollFrame(panel, "LoadoutPlannerTopBuildsScroll")
+scroll:SetPoint("TOPLEFT", PAD, -94)
+scroll:SetPoint("BOTTOMRIGHT", -26, LIST_BOTTOM)
+local content = CreateFrame("Frame", nil, scroll)
+content:SetSize(WIDTH - 2 * PAD - 18, 1)
+scroll:SetScrollChild(content)
+
+-- On the bottom bar: how to use the rows...
+local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+hint:SetPoint("BOTTOMLEFT", PAD + 2, 40)
+hint:SetPoint("RIGHT", -PAD - 2, 0)
+hint:SetJustifyH("CENTER")
+hint:SetText("Click: put on talent screen  |  Double-click: apply  |  Right-click: save / tag  |  Hover: compare")
+
+-- ...and the source buttons (which data the list shows). Only shown when
+-- more than one source has data; with one source, the header line alone
+-- says where the builds come from.
 local sourceButtons = {}
 for i = #SOURCES, 1, -1 do -- laid out right to left
     local source = SOURCES[i]
     local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-    button:SetSize(76, 20)
+    button:SetSize(84, 22)
     if i == #SOURCES then
-        button:SetPoint("TOPRIGHT", -12, ns.Style.CONTENT_TOP)
+        button:SetPoint("BOTTOMRIGHT", -PAD - 4, 12)
     else
         button:SetPoint("RIGHT", sourceButtons[i + 1], "LEFT", -4, 0)
     end
@@ -331,43 +436,9 @@ for i = #SOURCES, 1, -1 do -- laid out right to left
     sourceButtons[i] = button
 end
 
-panel.source = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-panel.source:SetPoint("TOPLEFT", 14, -54)
-panel.source:SetPoint("RIGHT", -14, 0)
-panel.source:SetJustifyH("LEFT")
-
 local sourceLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 sourceLabel:SetPoint("RIGHT", sourceButtons[1], "LEFT", -6, 0)
 sourceLabel:SetText("Source:")
-
--- Tabs
-local selectedTab = "mythic"
-local tabButtons = {}
-
-for i, tab in ipairs(TABS) do
-    local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-    button:SetSize(64, 20)
-    button:SetPoint("TOPLEFT", 12 + (i - 1) * 68, -84)
-    button:SetText(tab.text)
-    button:SetScript("OnClick", function()
-        selectedTab = tab.key
-        refresh()
-    end)
-    tabButtons[tab.key] = button
-end
-
-local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-hint:SetPoint("TOPLEFT", 14, -110)
-hint:SetPoint("RIGHT", -14, 0)
-hint:SetJustifyH("LEFT")
-hint:SetText("Click: put on talent screen | Double-click: apply | Right-click: save / tag | Hover: compare")
-
-local scroll = ns.Style.CreateScrollFrame(panel, "LoadoutPlannerTopBuildsScroll")
-scroll:SetPoint("TOPLEFT", 12, -126)
-scroll:SetPoint("BOTTOMRIGHT", -24, 10)
-local content = CreateFrame("Frame", nil, scroll)
-content:SetSize(WIDTH - 36, 1)
-scroll:SetScrollChild(content)
 
 -- Is this exact build already in your library?
 local function inLibrary(code)
@@ -432,7 +503,7 @@ local function openRowMenu(frame, row, tab)
             end
             root:CreateDivider()
         end
-        root:CreateButton("Get from Archon...", function()
+        root:CreateButton("Compare on Archon...", function()
             ns.OpenArchonDialog(archonTarget(row, tab))
         end)
     end)
@@ -450,24 +521,24 @@ local function createRowFrame(index)
     ns.Style.SetRowHighlight(frame)
 
     frame.icon = frame:CreateTexture(nil, "ARTWORK")
-    frame.icon:SetSize(32, 32)
-    frame.icon:SetPoint("LEFT", 4, 0)
+    frame.icon:SetSize(34, 34)
+    frame.icon:SetPoint("LEFT", 6, 0)
     frame.ring = ns.Style.AddIconBorder(frame, frame.icon)
 
-    frame.archon = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    frame.archon:SetSize(64, 20)
-    frame.archon:SetPoint("RIGHT", -4, 0)
-    frame.archon:SetText("Archon")
+    -- Link to the site this build comes from (its text is the source's name).
+    frame.link = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.link:SetSize(72, 20)
+    frame.link:SetPoint("RIGHT", -4, 0)
 
     frame.name = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.name:SetPoint("TOPLEFT", frame.icon, "TOPRIGHT", 8, -1)
-    frame.name:SetPoint("RIGHT", frame.archon, "LEFT", -6, 0)
+    frame.name:SetPoint("RIGHT", frame.link, "LEFT", -6, 0)
     frame.name:SetJustifyH("LEFT")
     frame.name:SetWordWrap(false)
 
     frame.status = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     frame.status:SetPoint("TOPLEFT", frame.name, "BOTTOMLEFT", 0, -3)
-    frame.status:SetPoint("RIGHT", frame.archon, "LEFT", -6, 0)
+    frame.status:SetPoint("RIGHT", frame.link, "LEFT", -6, 0)
     frame.status:SetJustifyH("LEFT")
     frame.status:SetWordWrap(false)
 
@@ -478,7 +549,7 @@ local function createRowFrame(index)
         elseif self.row.build then
             ns.HandleBuildClick(self, self.row.build)
         else
-            ns.Print("No logged build here yet. Right-click for Archon.")
+            ns.Print("No logged build here yet.")
         end
     end)
     frame:SetScript("OnEnter", function(self)
@@ -487,9 +558,20 @@ local function createRowFrame(index)
         end
     end)
     frame:SetScript("OnLeave", ns.HideDiff)
-    frame.archon:SetScript("OnClick", function()
-        ns.OpenArchonDialog(archonTarget(frame.row, frame.tab))
+    frame.link:SetScript("OnClick", function(self)
+        local source = self.source
+        if source then
+            ns.ShowLink(("Builds from |cffffd100%s|r"):format(source.text), source.link(ns.GetSpecID()))
+        end
     end)
+    frame.link:SetScript("OnEnter", function(self)
+        if not self.source then return end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Where this build comes from")
+        GameTooltip:AddLine(("Shows a link to %s to copy into your browser."):format(self.source.text), 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    frame.link:SetScript("OnLeave", GameTooltip_Hide)
     return frame
 end
 
@@ -516,12 +598,15 @@ local function sourceLine(source, byCategory)
     end
     local data = useBuiltinParses()
     if data then
-        return ("Most-played builds from parses.gg logs%s. Built in, updated %s. Update LoadoutPlanner for fresh builds.")
-            :format(data.season and data.season.name and (", " .. data.season.name) or "", ageText(data.generated))
+        -- Since v0.19 the data is the top 10% of players where there's enough
+        -- of it ("top players" in a row), and everyone elsewhere ("players").
+        local who = data.cohort == "top10" and "the top 10% of players" or "all players"
+        return ("Most-played builds of %s in parses.gg logs%s. Built in, updated %s.")
+            :format(who, data.season and data.season.name and (", " .. data.season.name) or "", ageText(data.generated))
     end
     if not byCategory then
         return "|cffffd100No parses.gg data.|r Update LoadoutPlanner (builds are included), or install "
-            .. "|cffffffffArchonTalentsData|r. The Archon buttons work either way."
+            .. "|cffffffffArchonTalentsData|r."
     end
     local updated
     for _, list in pairs(byCategory) do
@@ -539,13 +624,20 @@ refresh = function()
 
     local tab = TAB_BY_KEY[selectedTab]
     for key, button in pairs(tabButtons) do
-        button:SetEnabled(key ~= selectedTab) -- the selected tab looks pressed
+        ns.Style.SetTabSelected(button, key == selectedTab)
     end
 
     local source = currentSource()
-    for i, button in ipairs(sourceButtons) do
-        button:SetEnabled(SOURCES[i] ~= source) -- the selected source looks pressed
+    local withData = 0
+    for _, s in ipairs(SOURCES) do
+        if s.available() then withData = withData + 1 end
     end
+    local showButtons = withData > 1 or clickedThisSession ~= nil
+    for i, button in ipairs(sourceButtons) do
+        ns.Style.SetTabSelected(button, SOURCES[i] == source)
+        button:SetShown(showButtons)
+    end
+    sourceLabel:SetShown(showButtons)
 
     local byCategory = ns.GetTopBuilds(specID, source.key)
     local rows = buildRows(tab, specID, byCategory)
@@ -558,6 +650,8 @@ refresh = function()
         rowFrames[i] = rowFrames[i] or createRowFrame(i)
         local frame = rowFrames[i]
         frame.row, frame.tab = row, tab
+        frame.link.source = source
+        frame.link:SetText(source.text)
         frame.name:SetText(row.label)
         ns.SetIcon(frame.icon, row.icon or 134400, true)
 
@@ -569,7 +663,10 @@ refresh = function()
             matches = ns.ItemMatchesCurrent(item)
             status = matches and "|cff40ff40Matches your talents|r" or "Top build"
             if row.share and row.samples then
-                status = status .. (" |cffffffff%d%%|r of %d players"):format(math.floor(row.share * 100 + 0.5), row.samples)
+                -- parses.gg data says whose builds these are: the top 10% of
+                -- players, or everyone (where too few top players logged it).
+                local who = row.cohort == "top10" and "top players" or "players"
+                status = status .. (" |cffffffff%d%%|r of %d %s"):format(math.floor(row.share * 100 + 0.5), row.samples, who)
             end
             local saved = inLibrary(row.build.code)
             if saved then

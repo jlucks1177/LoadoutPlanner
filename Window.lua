@@ -267,6 +267,14 @@ local function openOptions(owner)
             ns.db.fitTalentWindow = not roomOn
             ns.PlaceWindow()
         end)
+        local otherOn = ns.db.promptOtherSpecs
+        root:CreateButton((otherOn and "|cff40ff40[x]|r " or "[  ] ") .. "Offer builds tagged in my other specs", function()
+            ns.db.promptOtherSpecs = not ns.db.promptOtherSpecs
+        end)
+        local simcOn = ns.db.simcExport ~= false -- default on
+        root:CreateButton((simcOn and "|cff40ff40[x]|r " or "[  ] ") .. "Add my builds to the SimulationCraft export", function()
+            ns.db.simcExport = not simcOn
+        end)
         local barOn = ns.db.showTalentTabBar
         root:CreateButton((barOn and "|cff40ff40[x]|r " or "[  ] ") .. "Spec buttons on talent tab too", function()
             ns.db.showTalentTabBar = not ns.db.showTalentTabBar
@@ -277,7 +285,13 @@ local function openOptions(owner)
     end)
 end
 
-local optionsButton = CreateFrame("Button", nil, window, "UIPanelButtonTemplate")
+-- Parented to the title bar: Blizzard's panel template draws its title
+-- bar at frame level 510, so a button on the window itself was hidden
+-- underneath it (the "..." vanished in v0.18). As the title bar's child,
+-- it draws on top of it.
+local optionsParent = (type(window.TitleContainer) == "table" and window.TitleContainer.CreateTexture)
+    and window.TitleContainer or window
+local optionsButton = CreateFrame("Button", nil, optionsParent, "UIPanelButtonTemplate")
 optionsButton:SetSize(26, 18)
 optionsButton:SetPoint("RIGHT", close, "LEFT", 0, 0)
 optionsButton:SetText("...")
@@ -286,30 +300,40 @@ optionsButton:SetScript("OnClick", openOptions)
 ------------------------------------------------------------------------
 -- Header contents: spec buttons, action buttons, context line
 ------------------------------------------------------------------------
-local function actionButton(text, width, previous, onClick)
+-- Three buttons sharing the row, from the left edge to the right edge
+-- (inside the border). v0.19 gave them fixed widths that added up to more
+-- than the row, so "New group" ran into the border.
+local function actionButton(text, onClick)
     local button = CreateFrame("Button", nil, window, "UIPanelButtonTemplate")
-    button:SetSize(width, 20)
-    if previous then
-        button:SetPoint("LEFT", previous, "RIGHT", 4, 0)
-    else
-        button:SetPoint("TOPLEFT", 10, -70)
-    end
+    button:SetHeight(22)
+    -- Blizzard's small button font: three labels in a 260px window leave
+    -- too little room for the normal size ("Save current" overflowed).
+    button:SetNormalFontObject("GameFontNormalSmall")
+    button:SetHighlightFontObject("GameFontHighlightSmall")
+    button:SetDisabledFontObject("GameFontDisableSmall")
     button:SetText(text)
     button:SetScript("OnClick", onClick)
     return button
 end
 
-local importButton = actionButton("Import", 72, nil, function()
+local importButton = actionButton("Import", function()
     ns.OpenEditor({})
 end)
-local saveButton = actionButton("Save current", 90, importButton, function()
+local saveButton = actionButton("Save current", function()
     -- Export your CURRENT talents (the active config) as a code.
     local ok, code = pcall(C_Traits.GenerateImportString, C_ClassTalents.GetActiveConfigID())
     ns.OpenEditor({ code = ok and code or "" })
 end)
-actionButton("New group", 74, saveButton, function()
+local groupButton = actionButton("New group", function()
     StaticPopup_Show("LOADOUTPLANNER_NEW_GROUP")
 end)
+-- "Save current" is the longest label, so it gets a bit more room.
+importButton:SetPoint("TOPLEFT", 12, -70)
+importButton:SetWidth(58)
+groupButton:SetPoint("TOPRIGHT", -12, -70)
+groupButton:SetWidth(76) -- "Save current" gets the rest: about 94px
+saveButton:SetPoint("LEFT", importButton, "RIGHT", 4, 0)
+saveButton:SetPoint("RIGHT", groupButton, "LEFT", -4, 0)
 
 window.context = window:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 window.context:SetPoint("TOPLEFT", 12, -96)
@@ -317,7 +341,10 @@ window.context:SetPoint("RIGHT", -12, 0)
 window.context:SetJustifyH("LEFT")
 
 -- Where UI.lua should put the list (between the header and the slider).
-ns.LIST_TOP, ns.LIST_BOTTOM = -112, 54
+-- The bottom stays above the talent window's bottom-bar art (60px tall,
+-- see Style.AddSpecArt); at 54 the scroll bar's down arrow sat on the
+-- bar's top edge.
+ns.LIST_TOP, ns.LIST_BOTTOM = -112, 68
 
 ------------------------------------------------------------------------
 -- Background art slider
@@ -343,20 +370,20 @@ EventUtil.ContinueOnAddOnLoaded("Blizzard_PlayerSpells", function()
     if not PlayerSpellsFrame then return end
 
     -- Spec buttons need spec data, which exists by the time this runs.
-    local specRow = ns.CreateSpecButtons(window, 28, 6)
+    local specRow = ns.CreateSpecButtons(window, 28, 10) -- 10: room for the rings
     specRow:SetPoint("TOPLEFT", 12, -34)
 
     -- "Top builds" sits on the spec row's right: builds for THIS spec.
     local topButton = CreateFrame("Button", nil, window, "UIPanelButtonTemplate")
     topButton:SetSize(86, 22)
-    topButton:SetPoint("TOPRIGHT", -10, -37)
+    topButton:SetPoint("TOPRIGHT", -12, -37)
     topButton:SetText("Top builds")
     topButton:SetScript("OnClick", function() ns.OpenTopBuilds() end)
     topButton:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
         GameTooltip:SetText("Top builds for your spec")
-        GameTooltip:AddLine("Most-played builds per dungeon and raid boss (needs the ArchonTalentsData addon), "
-            .. "plus Archon links for each.", 1, 1, 1, true)
+        GameTooltip:AddLine("Most-played builds per dungeon and raid boss (built in, from parses.gg), "
+            .. "with a link to where each comes from.", 1, 1, 1, true)
         GameTooltip:Show()
     end)
     topButton:SetScript("OnLeave", GameTooltip_Hide)

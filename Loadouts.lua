@@ -74,6 +74,24 @@ function ns.ExpectLoad(name)
     inFlightLoad = name
 end
 
+-- A Blizzard loadout as a "build" we can apply ourselves: its talents as
+-- an import code. Used when the game won't reload the selected loadout.
+local function loadoutAsBuild(configID, name)
+    local ok, code = pcall(C_Traits.GenerateImportString, configID)
+    if ok and type(code) == "string" and code ~= "" then
+        return { code = code, specID = ns.GetSpecID(), name = name }
+    end
+end
+
+-- Blizzard's talent window, when it's loaded and knows its loadouts.
+local function talentFrame()
+    local frame = PlayerSpellsFrame and PlayerSpellsFrame.TalentsFrame
+    if frame and type(frame.LoadConfigByPredicate) == "function"
+        and type(frame.configIDs) == "table" and frame.variablesLoaded then
+        return frame
+    end
+end
+
 function ns.LoadLoadout(configID, name)
     if InCombatLockdown() then
         pendingLoad = { configID = configID, name = name }
@@ -81,6 +99,32 @@ function ns.LoadLoadout(configID, name)
         return
     end
 
+    -- PREFERRED: Blizzard's own way, exactly what picking the loadout in the
+    -- talent window's dropdown does. LoadConfigByPredicate is one of the
+    -- "script command helpers" Blizzard provides for macros and addons.
+    -- Besides loading the talents, it tells the talent window which loadout
+    -- is now selected, so the dropdown switches to it when the change
+    -- finishes. (Calling C_ClassTalents.LoadConfig ourselves changed the
+    -- talents but left the dropdown on the old loadout, so your next build
+    -- was saved into the wrong one.)
+    local frame = talentFrame()
+    if frame then
+        inFlightLoad = name
+        local ok, err = pcall(frame.LoadConfigByPredicate, frame, function(_, id) return id == configID end)
+        if not ok then
+            inFlightLoad = nil
+            ns.Print(("Couldn't load %s: %s"):format(name, tostring(err)))
+        elseif frame.IsCommitInProgress and not frame:IsCommitInProgress() then
+            -- Nothing to change (or the game refused, and said why on screen).
+            inFlightLoad = nil
+            ns.Notify()
+        else
+            ns.Print(("Switching to |cffffd100%s|r..."):format(name))
+        end
+        return
+    end
+
+    -- FALLBACK (talent window not loaded yet): the direct API calls.
     -- autoApply = true means "switch and commit", like picking from the dropdown.
     -- The call only STARTS the change (you'll see a "Changing Talents" cast).
     local result, changeError = C_ClassTalents.LoadConfig(configID, true)
@@ -97,6 +141,20 @@ function ns.LoadLoadout(configID, name)
     C_ClassTalents.UpdateLastSelectedSavedConfigID(ns.GetSpecID(), configID)
 
     if result == Enum.LoadConfigResult.NoChangesNecessary then
+        -- The game can answer "no changes" for the loadout that's already
+        -- selected even when your talents differ from what it saved (for
+        -- example a build was applied but saving it didn't finish). If the
+        -- talents really differ, apply the loadout's own talents directly.
+        local matches = ns.ItemMatchesCurrent
+            and ns.ItemMatchesCurrent({ key = configID, configID = configID, name = name })
+        -- Only for the loadout that's selected: applying saves into the
+        -- selected loadout, so doing this for another one would overwrite it.
+        local build = matches == false and configID == ns.GetSelectedConfigID()
+            and loadoutAsBuild(configID, name)
+        if build and ns.ApplyBuild then
+            ns.ApplyBuild(build)
+            return
+        end
         ns.Print(("|cffffd100%s|r is already active."):format(name))
         ns.Notify()
     else

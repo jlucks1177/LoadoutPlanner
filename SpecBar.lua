@@ -71,7 +71,7 @@ local function updateRow(row)
         local active = (index == current)
         button.icon:SetDesaturated(not active) -- gray out inactive specs
         button.icon:SetAlpha(active and 1 or 0.75)
-        button.activeGlow:SetShown(active)
+        ns.Style.SetIconActive(button.ring, active) -- gold = your spec, grey = the others
     end
 end
 
@@ -123,10 +123,9 @@ function ns.CreateSpecButtons(parent, size, spacing)
         button.icon:SetTexture(icon)
         button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) -- trim the icon's built-in border
 
-        button.activeGlow = button:CreateTexture(nil, "OVERLAY")
-        button.activeGlow:SetTexture("Interface\\Buttons\\CheckButtonHilight")
-        button.activeGlow:SetBlendMode("ADD")
-        button.activeGlow:SetAllPoints()
+        -- The same ring as the loadout list (Style.lua): gold for your
+        -- current spec, a grey square for the others, corners masked.
+        button.ring = ns.Style.AddIconBorder(button, button.icon)
 
         button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
 
@@ -166,7 +165,7 @@ EventUtil.ContinueOnAddOnLoaded("Blizzard_PlayerSpells", function()
     if not PlayerSpellsFrame then return end
     -- Parented to the Talents TAB, so it only shows on that tab.
     local host = PlayerSpellsFrame.TalentsFrame or PlayerSpellsFrame
-    talentTabBar = ns.CreateSpecButtons(host, 34, 4)
+    talentTabBar = ns.CreateSpecButtons(host, 34, 10) -- room for the rings between icons
     talentTabBar:SetFrameLevel(host:GetFrameLevel() + 200)
     talentTabBar:SetPoint("BOTTOMRIGHT", PlayerSpellsFrame, "BOTTOMRIGHT", BAR_OFFSET_X, BAR_OFFSET_Y)
     ns.UpdateTalentTabBar()

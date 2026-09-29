@@ -164,7 +164,7 @@ export async function runParses({ config, log = console.log, fetchImpl, now = ne
     dungeonOrder: names.dungeonOrder, bossOrder: names.bossOrder, log,
   });
   return {
-    source: 'parses.gg', generated: now.toISOString(), season: names.season || undefined,
+    source: 'parses.gg', cohort: 'top10', generated: now.toISOString(), season: names.season || undefined,
     raids: names.raids, gameBuild: parses.gameBuild || undefined,
     mythic: parses.mythic, raid: parses.raid, stats: parses.stats,
   };

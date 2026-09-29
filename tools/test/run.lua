@@ -41,6 +41,8 @@ local tests = {
     "tools/test/test_load.lua fallback",
     "tools/test/test_load.lua missing",
     "tools/test/test_topbuilds.lua",
+    "tools/test/test_tags.lua",
+    "tools/test/test_simc.lua",
 }
 local failed = syntaxOK and 0 or 1
 for _, test in ipairs(tests) do

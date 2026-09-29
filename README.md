@@ -1,10 +1,10 @@
 # LoadoutPlanner
 
-A World of Warcraft addon (Retail, Midnight 12.1) for managing talent builds. It adds a panel to the talent window where you can keep an unlimited library of builds organized into groups, switch specs and builds with one click, compare any build against your current talents, browse the most-played builds for your spec per dungeon and raid boss (with Archon links), and tag builds to dungeons, raids, and bosses (optionally per difficulty) from anywhere, so the right one is offered when you zone in.
+A World of Warcraft addon (Retail, Midnight 12.1) for managing talent builds. It adds a panel to the talent window where you can keep an unlimited library of builds organized into groups, switch specs and builds with one click, compare any build against your current talents, browse the most-played builds for your spec per dungeon and raid boss (with links to where they come from), and tag builds to dungeons, raids, and bosses (optionally per difficulty) from anywhere, so the right one is offered when you zone in.
 
-**Version:** 0.18.1 · **Author:** Joe · **Game version:** 12.1 (`## Interface: 120100`)
+**Version:** 0.19.0 · **Game version:** 12.1 (`## Interface: 120100`)
 
-For a guided tour of the source code, written as a tutorial, see **LEARNING.md**. This README covers what the addon does and how it works.
+This README covers what the addon does and how it works.
 
 ---
 
@@ -52,8 +52,8 @@ If the addon shows as "out of date", confirm the game's interface number with `/
 1. Open your talents (default key **N**). The LoadoutPlanner window appears beside the talent window.
 2. Click **Save current** to save your current talents as a custom build. Give it a name and a group (for example "Raid"), pick an icon, and click **Save**.
 3. Build a second set of talents and save that too.
-4. **Click** a build to put its talents on the talent screen, then press Blizzard's **Apply Changes**, or just **double-click** the build to apply it straight away. Either way, it's saved into the Blizzard loadout you have selected. Hover over a build to see how it differs from your current talents.
-5. Right-click a build → **Tag...** and click a difficulty next to any raid, boss, or dungeon. You don't need to be there. The build now shows that icon, and it's highlighted (and offered) when you're there on that difficulty.
+4. **Click** a custom build to put its talents on the talent screen, then press Blizzard's **Apply Changes**, or just **double-click** the build to apply it straight away. Either way, it's applied **onto the Blizzard loadout you have active** (the one selected in Blizzard's dropdown). Clicking a Blizzard loadout in the list switches to it, just like the dropdown. Hover over a build to see how it differs from your current talents.
+5. Right-click a build → **Tag...** and click a difficulty next to any raid, boss, or dungeon. You don't need to be there. The build now shows that icon, and it's highlighted (and offered) when you're there. In dungeons, any difficulty counts.
 
 ---
 
@@ -76,7 +76,7 @@ The window always tries to sit **beside** the talent window, on its right.
 | Element | What it does |
 |---|---|
 | **Spec buttons** | One button per specialization. The active spec is bright; click another to switch ([section 9](#9-switching-specs)). |
-| **Top builds** | Opens the Top builds panel for your spec: most-played builds per dungeon and boss, plus Archon links ([section 12](#12-top-builds-and-archon)). |
+| **Top builds** | Opens the Top builds panel for your spec: most-played builds per dungeon and boss, plus a link to where each build comes from ([section 12](#12-top-builds-and-archon)). |
 | **Import** | Opens the build editor with an empty import code field. |
 | **Save current** | Opens the build editor with your current talents' import code filled in. |
 | **New group** | Creates an empty group. |
@@ -86,6 +86,8 @@ The window always tries to sit **beside** the talent window, on its right.
 ### Options menu (**...**)
 
 - **Move/shrink talent window to make room**: on by default. Turn it off to leave the talent window exactly as Blizzard places it. The window then goes inside when it doesn't fit beside.
+- **Offer builds tagged in my other specs**: off by default. When on, entering a place tagged only in another spec offers to switch spec ([section 8](#8-tags-difficulties-and-zone-in-prompts)).
+- **Add my builds to the SimulationCraft export**: on by default. See [Raidbots](#raidbots-simulationcraft-export) below.
 - **Spec buttons on talent tab too**: off by default. Adds a second row of spec buttons to the talent tab's bottom bar.
 - **Import from Talent Loadout Ex**: see [section 11](#11-importing-from-talent-loadout-ex).
 
@@ -108,7 +110,7 @@ The list has two kinds of entries, shown in collapsible sections:
 |---|---|
 | **Left-click** a custom build | Puts its talents on the talent screen as pending changes (see [section 6](#6-applying-builds)). A single click waits 0.3 seconds to make sure it isn't the start of a double-click. |
 | **Double-click** a custom build | Puts its talents on the talent screen **and applies them**. |
-| **Left-click** a Blizzard loadout | Loads it, exactly like Blizzard's dropdown. |
+| **Left-click** a Blizzard loadout | Switches to it, exactly like picking it in Blizzard's dropdown: the talents change and the dropdown shows it as your loadout. (Uses Blizzard's own loader, `TalentsFrame:LoadConfigByPredicate`.) |
 | **Right-click** a row | Options menu for that entry (see below). |
 | **Hover** a row | Shows the comparison tooltip ([section 7](#7-comparing-builds)). |
 | **Left-click** a group header | Collapses or expands the group. |
@@ -118,7 +120,7 @@ The list has two kinds of entries, shown in collapsible sections:
 
 - **Icon**, chosen in this order: the icon you picked for the build → the icon of the dungeon, raid, or boss it's tagged to → your spec's icon.
 - **Name**, and underneath it the places it's tagged to, with the difficulty in brackets when a tag is difficulty-specific, for example "Nymrissa (M), Ara-Kara, City of Echoes (M+)". Untagged entries say "untagged".
-- **Icon ring**: green normally, **gold** when that entry's talents are exactly your current talents (the same rule as the check mark).
+- **Icon ring**: grey normally, **gold** when that entry's talents are exactly your current talents (the same rule as the check mark).
 - **Check mark** when that entry's talents are **exactly your current talents**. Every matching entry is checked, not just the one you clicked, so duplicates (for example the same build saved under two bosses) all show a check mark together. The comparison ignores free, automatically granted talents and updates live as you change talents.
 - **Green strip** on the left edge when the entry is tagged to the dungeon or raid you're currently in, or to one of its bosses, **at your current difficulty** (or for any difficulty).
 
@@ -138,7 +140,7 @@ Custom builds are import codes stored by LoadoutPlanner, each with a name, a gro
 
 ### The build editor
 
-Opened by **Import**, **Save current**, **Edit...**, **Add build here...**, or **Save as custom build...**.
+Opened by **Import**, **Save current**, **Edit...**, **Add build here...**, or **Save as custom build...**. It has three sections, **Talents**, **Details** and **Choose an icon**, and you drag it by its title bar.
 
 - **Import code:** paste any talent import code (from Blizzard's export, Wowhead, Raidbots, Archon, and so on). It's checked as you type:
   - **"OK: *Spec* build"**: the code is valid for your class.
@@ -146,10 +148,10 @@ Opened by **Import**, **Save current**, **Edit...**, **Add build here...**, or *
   - **"This code is from an older game version. Re-export it."**: Blizzard changed the code format since it was made.
   - **"This code is for a different class."**
 - **Build name:** required.
-- **Group:** type any name. A new name creates a new group, and the **v** button lists existing groups. Leave it empty to use "Ungrouped".
-- **Selected icon** (top right): shows the build's icon. **Right-click** it to go back to the automatic spec icon.
+- **Group:** type any name. A new name creates a new group, and the arrow button next to it lists existing groups. Leave it empty to use "Ungrouped".
+- **Icon** (right of the name and group): shows the build's icon in a gold ring. **Right-click** it to go back to the automatic spec icon.
 - **Choose an icon:** the embedded icon picker (below).
-- **Save** / **Cancel**. Escape closes the editor, and Tab moves between fields.
+- **Save** / **Cancel** (on the bottom bar). Escape closes the editor, and Tab moves between fields.
 
 ### The icon picker
 
@@ -161,7 +163,7 @@ Icons are listed with the most useful first:
 4. **Talents:** every talent in your class tree, alphabetically.
 5. **All icons:** Blizzard's full icon list (the one the macro window uses).
 
-**Jump buttons** above the grid scroll straight to each section. Scroll with the mouse wheel or the scroll bar. Hover an icon to see its name, and click it to select it (it's highlighted, and the preview updates).
+**Section buttons** above the grid scroll straight to each section, and the one for the section you're looking at stays lit. Scroll with the mouse wheel or the scroll bar. Hover an icon to see its name, and click it to select it (its ring turns gold, and the preview updates).
 
 **Search** matches boss, dungeon, spec, and talent names. Typing a **number** looks up that **spell ID or item ID**, for example `8921` for Moonfire. The "All icons" list can't be searched, because Blizzard's icon list has no names attached to its icons.
 
@@ -183,10 +185,12 @@ Icons are listed with the most useful first:
 | You do | What happens |
 |---|---|
 | **Single-click** the build | Its talents appear on the talent screen as **pending changes**, highlighted and with **Apply Changes** lit, as if you'd clicked them yourself. Nothing is permanent yet. Review them, tweak them, or press Escape or Undo to discard them. |
-| Press Blizzard's **Apply Changes** | The changes are applied ("Changing Talents" cast) and saved into your selected loadout. **This is the recommended way.** |
-| **Double-click** the build | The changes are staged **and applied** in one go, into your selected loadout. |
+| Press Blizzard's **Apply Changes** | The changes are applied ("Changing Talents" cast) and saved into your active Blizzard loadout. **This is the recommended way.** |
+| **Double-click** the build | The changes are staged **and applied** in one go, into your active Blizzard loadout. |
 
-**Why Apply Changes is recommended:** when addon code (rather than Blizzard's button) applies talents, WoW can flag the talent interface as "tainted", which in some cases breaks action-bar keybinds until you `/reload` (a known WoW issue, WoWUIBugs #447). Staging from the addon and applying with Blizzard's own button avoids that. Double-click is there for convenience. If you ever see blocked-action errors afterwards, switch to single-click + Apply Changes.
+**How the two kinds fit together:** your **Blizzard loadouts are the slots** (Raid, M+, ...), switched by clicking them in the list or in Blizzard's dropdown. **Custom builds fill the active slot**: applying one overwrites the Blizzard loadout that's currently active with that build's talents.
+
+**Why Apply Changes is recommended:** when addon code (rather than Blizzard's button) applies talents, WoW can flag the talent interface as "tainted", which in some cases breaks action-bar keybinds until you `/reload` (a known WoW issue, WoWUIBugs #447). Staging from the addon and applying with Blizzard's own button avoids that. Double-click is there for convenience. If you ever see blocked-action errors afterwards, `/reload`, and switch to single-click + Apply Changes.
 
 **Under the hood:**
 
@@ -194,7 +198,7 @@ Icons are listed with the most useful first:
 2. **Fast path:** only the talents that differ are changed. Talents the build doesn't want are refunded, working bottom-up so talents that depend on others go first, and missing ones are learned, working top-down so prerequisites come first. Every talent change makes Blizzard's talent window redraw, so changing 5 talents instead of re-learning 120 is the difference between instant and a visible freeze.
 3. **Full path:** used if the build switches hero trees, or if the fast path doesn't end up exactly right. The tree is cleared (`C_Traits.ResetTree`) and everything is learned, in repeated passes until nothing more can be learned.
 4. **Verify:** the result is compared with the build using its talent fingerprint (see [section 14](#14-how-it-works)). If it doesn't match (usually an outdated code), **everything is rolled back** to your committed talents, and chat says "*N* talents wouldn't learn".
-5. **Apply** (double-click only): `C_Traits.CommitConfig` commits your talents ("Changing Talents" cast). Talent Loadout Ex uses the same call, because it doesn't run any of Blizzard's talent-window code and so avoids spreading taint. When the game confirms, the result is saved into your selected loadout with `C_ClassTalents.SaveConfig`.
+5. **Apply** (double-click only): `C_Traits.CommitConfig` commits your talents ("Changing Talents" cast). Talent Loadout Ex uses the same call, because it doesn't run any of Blizzard's talent-window code and so avoids spreading taint. When the game confirms, the result is saved into your active Blizzard loadout with `C_ClassTalents.SaveConfig`. (If you click the already-selected Blizzard loadout while your talents differ from it, the game may say "no changes necessary"; LoadoutPlanner notices and applies that loadout's talents itself.)
 
 A double-click does all of this **once**: the first click's staging is cancelled when the second click arrives.
 
@@ -205,6 +209,10 @@ A double-click does all of this **once**: the first click's staging is cancelled
 `/lp load <name>` and the zone-in prompt apply builds directly, like a double-click.
 
 ---
+
+### Raidbots (SimulationCraft export)
+
+With the **SimulationCraft** addon installed, `/simc` includes **your custom builds for your current spec** alongside your Blizzard loadouts, so Raidbots offers them as talent options, the way Talent Loadout Ex did. Each appears as a `# Saved Loadout: <name>` entry. Builds with exactly the same talents as a Blizzard loadout (or your active talents) aren't listed twice, and colour codes in names are removed. SimulationCraft's checksum is recalculated so Raidbots accepts the profile. If the profile ever looks unfamiliar (for example after a SimulationCraft update), LoadoutPlanner leaves it untouched. Turn it off in the **...** menu.
 
 ## 7. Comparing builds
 
@@ -249,12 +257,14 @@ Each row has a button per difficulty: **Any**, then **LFR / N / H / M** for raid
 
 ### How difficulty is matched
 
-When you're in an instance, a tag for your **exact difficulty** wins. Otherwise an **any difficulty** tag applies. So you can tag a raid "any difficulty" with your general build and add a "Mythic" tag for a specific boss or for the whole raid.
+**Dungeons:** being inside is enough. Every build tagged for that dungeon, or for **All dungeons**, is offered whatever the difficulty; the difficulty only decides the order (exact difficulty first, then Mythic+, then any difficulty, then the other difficulties).
+
+**Raids:** a tag for your **exact difficulty** wins. Otherwise an **any difficulty** tag applies. So you can tag a raid "any difficulty" with your general build and add a "Mythic" tag for a specific boss or for the whole raid.
 
 ### Effects
 
 - The row shows its tags under its title, with the difficulty in brackets, and the dungeon, raid, or boss icon (unless you picked your own).
-- While you're in that instance **on a matching difficulty**, the row gets a **green strip**.
+- While you're in that instance (a raid: **on a matching difficulty**), the row gets a **green strip**.
 - **Zone-in prompt** (see below).
 
 ### The zone-in prompt
@@ -266,16 +276,21 @@ Builds are offered in this order, without duplicates:
 1. The instance, tagged for **this exact difficulty**.
 2. **In any dungeon, its Mythic+ tag**, whatever the difficulty (Normal, Heroic, or Mythic). A key can only be started from inside the dungeon, and talents lock once it starts, so walking in is the only moment a Mythic+ build can be offered.
 3. The instance, tagged for **any difficulty**.
-4. **All dungeons** / **All raids** tags, with the same rules: this difficulty, then (for dungeons) Mythic+, then any difficulty. A tag on the specific place always comes before these general ones.
-5. Each **boss** of the instance (this difficulty first, then any difficulty), skipping bosses you've already killed on this difficulty.
+4. **Dungeons only:** the instance's tags for **every other difficulty**. Being in the dungeon is enough.
+5. **All dungeons** / **All raids** tags, with the same rules: this difficulty, then (for dungeons) Mythic+, then any difficulty. A tag on the specific place always comes before these general ones.
+6. Each **boss** of the instance (this difficulty first, then any difficulty), skipping bosses you've already killed on this difficulty.
 
-**Tagged in another spec?** Tags belong to the spec you made them in. If the place has nothing tagged for your current spec but **another spec** does, you get a different prompt instead: **"*Place* is tagged for another spec"**, with a **Switch to *Spec*** button for each spec that has builds here (hover it to see which builds). Switching spec, whether from that button or any other way, re-runs the check, and the normal build prompt for the new spec follows.
+**Only your current spec's builds are offered.** Tags belong to the spec you made them in, and the prompt only looks at the spec you're in. Your DPS spec's raid build is never offered while you're healing.
+
+**Optional: offer other specs.** Turn on **... → Offer builds tagged in my other specs** (off by default). Then, if the place has nothing tagged for your current spec but **another spec** does, you get a different prompt: **"*Place* is tagged for another spec"**, with a **Switch to *Spec*** button for each spec that has builds here (hover it to see which builds). Switching spec, whether from that button or any other way, re-runs the check, and the normal build prompt for the new spec follows.
 
 **Finding tags reliably:** a tag matches the instance if it was made under the instance's ID as the game reports it, **or** under the Encounter Journal's ID for it (they can differ), **or** if its saved place name matches the instance's name.
 
 The prompt **isn't shown** if you already have one of those builds' exact talents (chat tells you which one), if you're in combat (it asks once combat ends), or once a Mythic+ key is running. It asks once per instance and difficulty per visit. After a loading screen it waits for your talent data to load (checking every 2 seconds, up to 6 times) rather than guessing.
 
 **Difficulties are recognized by what they are, not only by number.** Known difficulty numbers are used directly. Anything else is classified from the game's own description of it (`GetDifficultyInfo`: raid finder, heroic, mythic, or challenge mode), so renumbered or special versions of a difficulty still match your tags.
+
+**Journal pages you can't enter are left out.** The Encounter Journal also lists the expansion's world bosses (as a "raid" named after the expansion) and a "Keystone Dungeons" overview page. Neither is a place you can be, so they're not in the tag panel, icon picker, or Top builds. Tags you made on "Keystone Dungeons" in earlier versions are moved to **All dungeons** automatically (chat says so). `/lp journal` lists what the game reports and what was left out.
 
 **If a prompt doesn't appear,** type `/lp why` inside the instance. It prints what LoadoutPlanner sees: the instance IDs it checks, the game's difficulty ID and how LoadoutPlanner classified it, every tag in your current spec with its place name, which other specs have builds tagged here, whether you're in combat or a key is running, whether it already asked, and each tagged build with whether it matches your talents. `/lp prompt` shows the prompt again, even if it already asked.
 
@@ -313,13 +328,15 @@ LoadoutPlanner can copy all your groups and loadouts from the **Talent Loadout E
 
 ## 12. Top builds and Archon
 
+> **Work in progress.** Top builds is still being worked on: where the builds come from and how they're chosen may change in future versions, and the suggestions may not always match what top players are running right now.
+
 Click **Top builds** in the window header (or type `/lp top`) to open a panel beside the window, listing the best-known build for **your current spec** on each of this season's dungeons and raid bosses.
 
 ### Where the builds come from
 
-**Nothing to set up:** LoadoutPlanner comes with the most-played builds **built in**. A daily job fetches them and publishes a new version of the addon whenever they change, so updating LoadoutPlanner through your addon manager keeps them fresh. The header shows when they were last updated, and turns orange after 3 days.
+**Nothing to set up:** LoadoutPlanner comes with the most-played builds **built in**. A daily job fetches them, and each new version of the addon ships with the latest, so updating LoadoutPlanner through your addon manager keeps them fresh. The header shows when they were last updated, and turns orange after 3 days.
 
-The panel has two sources, switched with the **Raider.IO** / **parses.gg** buttons at its top right (your choice is remembered). Each can come from the built-in data, or from something you install or run yourself; LoadoutPlanner uses whichever is newer:
+The panel has two sources, switched with the **Raider.IO** / **parses.gg** buttons at its bottom right (your choice is remembered). Each can come from the built-in data, or from something you install or run yourself; LoadoutPlanner uses whichever is newer:
 
 **parses.gg** is built in. **Raider.IO** is built in once the maintainer has enabled it. Advanced users can also use:
 
@@ -336,7 +353,13 @@ To get it: install Node.js, put your Raider.IO API key and AddOns path in Loadou
 - **[ArchonTalentsData](https://github.com/EliteTC/ArchonTalentsData)**: updated daily with the most-played builds from **parses.gg** logs (real logged kills and keys), including LFR and Normal. It has its own updater script.
 - **PeaversTalentsData**: the original addon with the same interface. Its old data source (wowcompare.io) has shut down, so ArchonTalentsData is the one to use. Don't install both, since they use the same global name.
 
-You can install either source, or both. Without any, the panel still lists every dungeon and boss with its **Archon** button. It just has no "Top build" to click.
+You can install either source, or both. Without any, the panel still lists every dungeon and boss. It just has no "Top build" to click.
+
+**Top players, not everyone:** the built-in parses.gg builds come from the **top 10% of players** in the logs, since what the average player runs often isn't the build good players use. Where too few top players have logged a dungeon or boss yet (at least 5 are needed), that row falls back to all players. Rows say "*N*% of *M* **top players**" or "*N*% of *M* **players**" so you can tell which.
+
+**Which source is used:** the built-in builds come from **parses.gg**. Raider.IO data isn't built in; the only Raider.IO data you can have is your own sync (LoadoutPlannerSync). The **Raider.IO / parses.gg** buttons only appear when more than one source has data. The **Raider.IO addon**'s own "Talent Builds" window (with its larger samples) is separate: its data is private to that addon, which offers no way for other addons to read it.
+
+**Each row's link button** (labelled with the source's name) shows a link to that source to copy into your browser: Raider.IO's talent page for your spec, or parses.gg.
 
 **Why not read the Raider.IO addon directly?** It does have a Talent Builds window, but its build data sits in the addon's private storage, which other addons can't see, and its public interface only covers player profiles. The official web API is the supported route, which is why LoadoutPlannerSync exists.
 
@@ -344,7 +367,7 @@ You can install either source, or both. Without any, the panel still lists every
 
 **archon.gg can't be read by addons or tools.** Since August 27, 2026 it shows a "Human Verification" page to automated requests, and its operator has asked addon authors not to use its data. That's why the data addons switched to parses.gg, and why LoadoutPlanner never fetches from Archon.
 
-What LoadoutPlanner does instead: every row has an **Archon** button that opens a small dialog with
+What LoadoutPlanner does instead: right-click a row → **Compare on Archon...** opens a small dialog with
 
 1. the exact **archon.gg link** for your spec and that dungeon or boss (and difficulty), to copy with Ctrl+C and open in your browser, and
 2. a **paste box**: copy the talent string from Archon's page and paste it in. The code is checked as you paste.
@@ -353,7 +376,7 @@ Then click **Save and tag** to save it to your library (group **Archon**, named 
 
 ### Using the panel
 
-- **Tabs:** **M+ / LFR / Normal / Heroic / Mythic.** When you're in an instance, the panel opens on the matching tab.
+- **Tabs:** **M+ / LFR / Normal / Heroic / Mythic.** The selected tab stays lit. When you're in an instance, the panel opens on the matching tab.
 - **Rows:** "All dungeons" or "All bosses" first, then each dungeon, or each boss in kill order. Each row shows the place's icon and a status: **Top build** (with "*N*% of *M* players" for Raider.IO data), **Matches your talents** (green) if your current talents are exactly that build, **No logged build yet** (common on Mythic early in a tier), and **saved as *name*** if that exact build is already in your library.
 - **Mouse:** click to put the build on the talent screen, double-click to apply it (the same rules as your own builds, [section 6](#6-applying-builds)), and hover to compare it with your talents ([section 7](#7-comparing-builds)).
 - **Right-click:**
@@ -361,7 +384,7 @@ Then click **Save and tag** to save it to your library (group **Archon**, named 
   - **Save and tag to *place* (*difficulty*):** saves it and tags it in one step, so the zone-in prompt will offer it. "All dungeons" and "All bosses" rows tag **All dungeons** / **All raids** at that difficulty.
   - **Copy talent string.**
   - **Other popular builds** (Raider.IO): the runners-up with their share, each of which you can put on the talent screen, apply, save, or save and tag.
-  - **Get from Archon...:** the same dialog as the button.
+  - **Compare on Archon...:** the Archon link-and-paste dialog (below).
 
 Saving never duplicates: if your library already has a build with exactly that talent string, it's reused, and only the tag is added.
 
@@ -385,6 +408,7 @@ Top builds are matched to the Encounter Journal **by name**. If your game langua
 | `/lp tagboss <#> <name>` | Tag a loadout or build to boss number `#` (any difficulty). |
 | `/lp boss <#>` | Load whatever is tagged to boss number `#` for your current difficulty. |
 | `/lp why` | Explain what the zone-in prompt sees in the current instance (for troubleshooting). |
+| `/lp journal` | List this season's raids and dungeons as the Encounter Journal reports them, including the pages left out. |
 | `/lp prompt` | Show the zone-in prompt again for the current instance. |
 | `/lp tags` | Show every tag for your current spec. |
 | `/lp importtle` | Import from Talent Loadout Ex. |
@@ -397,7 +421,7 @@ Top builds are matched to the Encounter Journal **by name**. If your game langua
 
 ### Tests
 
-`lua tools/test/run.lua` (from the repository root, any Lua 5.1 or newer) loads every file against a fake WoW API and checks the main windows and the Top builds panel. GitHub runs it on every push (`ci.yml`) and before every release, so a broken build never reaches players. See `tools/test/` and LEARNING.md Part 19.
+`lua tools/test/run.lua` (from the repository root, any Lua 5.1 or newer) loads every file against a fake WoW API and checks the main windows and the Top builds panel. GitHub runs it on every push (`ci.yml`) and before every release, so a broken build never reaches players. See `tools/test/`.
 
 ### File map
 
@@ -412,7 +436,7 @@ Files load in this order (see `LoadoutPlanner.toc`), and each file only uses thi
 | `Builds.lua` | Account-wide build library: groups, builds, ordering, IDs, and reading import code headers. |
 | `ImportTLE.lua` | Converting Talent Loadout Ex's saved data. |
 | `Import.lua` | Parsing import codes (via Blizzard's own parser), staging builds onto the talent screen, and applying them. |
-| `Journal.lua` | Encounter Journal data (this season's raids, bosses, and dungeons, with the map and encounter IDs used by tags), square boss icons, difficulty names, and icon drawing. |
+| `Journal.lua` | Encounter Journal data (this season's raids, bosses, and dungeons, with the map and encounter IDs used by tags; pages you can't enter left out), square boss icons, difficulty names, and icon drawing. |
 | `Context.lua` | Detecting the current instance, its bosses, and its difficulty, deciding which tagged builds to offer (`ns.GetCandidates`), when to prompt, `/lp why`, and tag commands. |
 | `Prompt.lua` | The zone-in prompt window (build choices, or spec switching when the place is tagged in another spec). |
 | `Diff.lua` | Build comparison (the tooltip), talent **fingerprints** (the check marks), and drawing the mini tree. |
@@ -425,6 +449,7 @@ Files load in this order (see `LoadoutPlanner.toc`), and each file only uses thi
 | `Archon.lua` | archon.gg links for each spec, dungeon, and boss, and the link-and-paste dialog. |
 | `Data/Builtin.lua` | The built-in builds (global `LoadoutPlannerBuiltin`), regenerated daily by the GitHub Action. |
 | `TopBuilds.lua` | The Top builds panel: reads both sources (built in, your own LoadoutPlannerData sync, or a PeaversTalentsData data addon) into one shape, matches builds to this season's journal, save-and-tag, runner-up builds. |
+| `Simc.lua` | Adds your custom builds to the SimulationCraft addon's `/simc` export for Raidbots (wraps `Simulationcraft:GetSimcProfile`, recomputes its checksum). |
 | `UI.lua` | The list inside the window: rows, headers, right-click menus, and popups. |
 
 ### Items: one interface for two kinds of entries
@@ -509,7 +534,7 @@ These live in `WTF/Account/<account>/SavedVariables/LoadoutPlanner.lua` and `WTF
 ## 16. Limitations
 
 - **Builds are applied into your selected Blizzard loadout,** overwriting its talents. Create and select a separate loadout first if you want to keep the old one.
-- **Applying from the addon (double-click) can occasionally taint the talent UI** (see [section 6](#6-applying-builds)). Single-click + Apply Changes avoids it.
+- **Applying from the addon (double-click) can occasionally taint the talent UI** (see [section 6](#6-applying-builds)). Single-click + Apply Changes avoids it; `/reload` clears it.
 - **PvP talents** aren't managed.
 - **Outdated codes** can't be applied after a talent tree change, the same as in Blizzard's own importer. Re-export them from their source.
 - **"All icons" can't be searched by name,** because the game provides no names for them.
@@ -530,7 +555,7 @@ These live in `WTF/Account/<account>/SavedVariables/LoadoutPlanner.lua` and `WTF
 | The window overlaps the talent tree | It's in inside mode because the talent window would have to shrink below 70%. Lower your UI scale, or use the **LP** tab to tuck the window away while you edit talents. |
 | Single-click shows the talents but **Apply Changes** stays grey | The talent window hasn't refreshed its buttons yet. Click any talent and click it back, or double-click the build instead. Please report it if it happens every time. |
 | Clicking a build freezes the game briefly | Should be rare since 0.10, which only changes the talents that differ. A full rebuild still happens when switching hero trees. If it happens every time, please report it. |
-| No prompt when entering a tagged instance | Type `/lp why` inside it, which explains exactly what it sees. Common causes: the tag is for another difficulty, you already have that build, you're in combat, or it already asked this visit (use `/lp prompt`). Tags made in another spec now produce a "tagged for another spec" prompt with a switch button. |
+| No prompt when entering a tagged instance | Type `/lp why` inside it, which explains exactly what it sees. Common causes: (raids) the tag is for another difficulty, you already have that build, you're in combat, or it already asked this visit (use `/lp prompt`). Tags only count in the spec you made them in (`/lp why` lists other specs' tags here). |
 | A tag doesn't highlight in the instance | Check its difficulty (shown in brackets). A Mythic tag doesn't apply in Heroic. |
 | "The Starter Build can't be changed" | Select or create a regular loadout in Blizzard's dropdown first. |
 | Blocked-action errors after applying | A known WoW taint issue with addon-applied talents. `/reload`, and use single-click + Apply Changes from then on. |

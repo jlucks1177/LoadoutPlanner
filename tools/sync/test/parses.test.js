@@ -26,7 +26,19 @@ function routes() {
     }
     if (route === '/api/builds/export') {
       const tier = q.get('tier');
-      assert.equal(q.get('cohort'), 'all');
+      const cohort = q.get('cohort');
+      assert.ok(cohort === 'top10' || cohort === 'all', `unexpected cohort ${cohort}`);
+      if (cohort === 'top10') {
+        // The top 10%: plenty of players on Murder Row, too few on Kings' Rest.
+        if (tier === 'b10') {
+          return { specs: [{ specId: BAL, classId: 11, encounters: [
+            { encounterId: null, label: 'All Dungeons', exportCode: code('11'), count: 30, sample: 60 },
+            { encounterId: 587, label: 'Murder Row', exportCode: code('11'), count: 30, sample: 40 },
+            { encounterId: 249, label: 'Kings Rest', exportCode: code('00'), count: 2, sample: 3 },
+          ] }] };
+        }
+        return { specs: [] }; // no top-10% raid data yet: fall back to all players
+      }
       if (tier === 'b10') {
         return { gameBuild: '12.1.0.1', specs: [{ specId: BAL, classId: 11, encounters: [
           { encounterId: null, label: 'All Dungeons', exportCode: code('10'), count: 300, sample: 500 },
@@ -61,13 +73,22 @@ test('parses.gg: current season only, names like the journal, shares from count/
   const balance = data.mythic[BAL];
   assert.deepEqual(balance.map((e) => e.target), ['All dungeons', 'Murder Row', "Kings' Rest"]);
   assert.equal(balance[0].isAll, true);
-  assert.equal(balance[1].samples, 50);
-  assert.equal(balance[1].builds[0].share, 0.8);
+  assert.equal(balance[0].cohort, 'top10', 'the aggregate comes from the top 10% too');
+  // Murder Row: 40 top-10% players is enough, so their build wins.
+  assert.equal(balance[1].cohort, 'top10');
+  assert.equal(balance[1].samples, 40);
+  assert.equal(balance[1].builds[0].share, 0.75);
+  assert.equal(balance[1].builds[0].code, code('11'));
+  // Kings' Rest: only 3 top-10% players, so fall back to everyone's data.
+  assert.equal(balance[2].cohort, 'all');
+  assert.equal(balance[2].samples, 30);
+  assert.equal(data.cohort, 'top10');
   assert.equal(data.mythic[103], undefined, 'an aggregate with no current-season data is not trusted');
   assert.equal(data.stats.outOfSeason, 1);
   assert.equal(data.stats.unreadable, 1);
 
   assert.equal(data.raid.mythic[BAL][0].target, "Nek'zali the Soulcoiler");
+  assert.equal(data.raid.mythic[BAL][0].cohort, 'all', 'no top-10% raid data: all players');
   assert.equal(data.raid.normal, undefined, 'a failing tier is skipped, not fatal');
 });
 

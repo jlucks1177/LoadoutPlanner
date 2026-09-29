@@ -18,9 +18,11 @@
 
 local addonName, ns = ...
 
-local COLS, SIZE, GAP = 11, 34, 4
+-- GAP leaves room for each icon's talent-node ring (it reaches 3px past
+-- the icon on every side), so neighbouring rings don't overlap.
+local COLS, SIZE, GAP = 10, 34, 8
 local ROW_H = SIZE + GAP
-local VISIBLE_ROWS = 8
+local VISIBLE_ROWS = 6
 
 ------------------------------------------------------------------------
 -- Data sources (raids, dungeons, boss icons: see Journal.lua)
@@ -179,7 +181,8 @@ end
 -- Returns the picker frame, with :Open(selectedTexture) to (re)load it.
 function ns.CreateIconPicker(parent, onPick)
     local picker = CreateFrame("Frame", nil, parent)
-    picker:SetSize(COLS * ROW_H - GAP + 22, 58 + VISIBLE_ROWS * ROW_H)
+    local gridWidth = COLS * ROW_H - GAP + 8 -- + 8: room for the outermost rings
+    picker:SetSize(gridWidth + 20, 62 + VISIBLE_ROWS * ROW_H)
 
     local rows, jumps = {}, {}
     local offset = 0 -- index of the first visible row, minus one
@@ -187,7 +190,7 @@ function ns.CreateIconPicker(parent, onPick)
 
     -- Search box
     local search = CreateFrame("EditBox", nil, picker, "SearchBoxTemplate")
-    search:SetSize(picker:GetWidth() - 8, 20)
+    search:SetSize(picker:GetWidth() - 8, 22)
     search:SetPoint("TOPLEFT", 6, 0)
     search:SetAutoFocus(false)
     if search.Instructions then
@@ -196,14 +199,19 @@ function ns.CreateIconPicker(parent, onPick)
 
     -- Jump buttons: scroll straight to a section.
     local jumpBar = CreateFrame("Frame", nil, picker)
-    jumpBar:SetPoint("TOPLEFT", 0, -26)
+    jumpBar:SetPoint("TOPLEFT", 0, -28)
     jumpBar:SetSize(picker:GetWidth(), 22)
 
-    -- Grid area
+    -- Grid area, on a darker band so the icons read as one block (like
+    -- the rows in the main window, which sit on a dark band too).
     local grid = CreateFrame("Frame", nil, picker)
-    grid:SetPoint("TOPLEFT", 0, -54)
-    grid:SetSize(COLS * ROW_H - GAP, VISIBLE_ROWS * ROW_H)
+    grid:SetPoint("TOPLEFT", 0, -60)
+    grid:SetSize(gridWidth, VISIBLE_ROWS * ROW_H)
     grid:EnableMouseWheel(true)
+    local gridBg = picker:CreateTexture(nil, "BACKGROUND")
+    gridBg:SetPoint("TOPLEFT", grid, "TOPLEFT", -2, 2)
+    gridBg:SetPoint("BOTTOMRIGHT", grid, "BOTTOMRIGHT", 16, -2)
+    gridBg:SetColorTexture(0, 0, 0, 0.3)
 
     -- Scroll bar: a vertical Slider whose value is the first visible row.
     local bar = CreateFrame("Slider", nil, picker)
@@ -220,8 +228,10 @@ function ns.CreateIconPicker(parent, onPick)
         t:SetColorTexture(0, 0, 0, 0.4)
     end)
     local thumb = bar:CreateTexture(nil, "OVERLAY")
+    ns.Style.SetAtlas(thumb, "minimal-scrollbar-thumb-middle", function(t)
+        t:SetColorTexture(0.75, 0.62, 0.35, 0.9)
+    end)
     thumb:SetSize(8, 32)
-    thumb:SetColorTexture(0.75, 0.62, 0.35, 0.9)
     bar:SetThumbTexture(thumb)
 
     -- The pool: VISIBLE_ROWS row frames, each able to be a header or icons.
@@ -229,27 +239,30 @@ function ns.CreateIconPicker(parent, onPick)
     for r = 1, VISIBLE_ROWS do
         local rowFrame = CreateFrame("Frame", nil, grid)
         rowFrame:SetSize(grid:GetWidth(), SIZE)
-        rowFrame:SetPoint("TOPLEFT", 0, -(r - 1) * ROW_H)
+        rowFrame:SetPoint("TOPLEFT", 0, -(r - 1) * ROW_H - 4)
 
-        rowFrame.header = rowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        rowFrame.header:SetPoint("BOTTOMLEFT", 2, 4)
+        -- Section titles ("Raid: ...", "Dungeons") get the same dark band
+        -- and gold rule as the main window's group headers.
+        rowFrame.headerBand = CreateFrame("Frame", nil, rowFrame)
+        rowFrame.headerBand:SetPoint("BOTTOMLEFT", 0, 2)
+        rowFrame.headerBand:SetPoint("BOTTOMRIGHT", 0, 2)
+        rowFrame.headerBand:SetHeight(ns.Style.HEADER_HEIGHT)
+        ns.Style.StyleHeader(rowFrame.headerBand, true)
+        rowFrame.header = rowFrame.headerBand:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        rowFrame.header:SetPoint("LEFT", 8, 0)
 
         rowFrame.buttons = {}
         for c = 1, COLS do
             local button = CreateFrame("Button", nil, rowFrame)
             button:SetSize(SIZE, SIZE)
-            button:SetPoint("LEFT", (c - 1) * ROW_H, 0)
+            button:SetPoint("LEFT", 4 + (c - 1) * ROW_H, 0)
             button.icon = button:CreateTexture(nil, "ARTWORK")
             button.icon:SetAllPoints()
+            -- The same talent-node ring as the main list: grey, and gold
+            -- for the icon you've chosen.
+            button.ring = ns.Style.AddIconBorder(button, button.icon)
             button.label = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
             button.label:SetPoint("BOTTOM", 0, 2)
-            -- The chosen icon gets the talent window's gold node ring.
-            button.selectedGlow = button:CreateTexture(nil, "OVERLAY")
-            button.selectedGlow:SetAllPoints()
-            ns.Style.SetAtlas(button.selectedGlow, "talents-node-pvpflyout-yellow", function(t)
-                t:SetTexture("Interface\\Buttons\\CheckButtonHilight")
-                t:SetBlendMode("ADD")
-            end)
             button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
             button:SetScript("OnClick", function(self)
                 selected = self.texture
@@ -274,7 +287,7 @@ function ns.CreateIconPicker(parent, onPick)
         button.name = name
         ns.SetIcon(button.icon, button.texture)
         button.label:SetText(label or "")
-        button.selectedGlow:SetShown(selected ~= nil and button.texture == selected)
+        ns.Style.SetIconActive(button.ring, selected ~= nil and button.texture == selected)
         button:Show()
     end
 
@@ -284,6 +297,7 @@ function ns.CreateIconPicker(parent, onPick)
             local rowFrame = rowFrames[r]
             local data = rows[offset + r]
             rowFrame.header:SetText(data and data.header or "")
+            rowFrame.headerBand:SetShown(data ~= nil and data.header ~= nil)
             for c, button in ipairs(rowFrame.buttons) do
                 if data and data.icons and data.icons[c] then
                     local item = data.icons[c]
@@ -304,15 +318,29 @@ function ns.CreateIconPicker(parent, onPick)
     bar:SetScript("OnValueChanged", function(_, value)
         offset = math.floor(value + 0.5)
         picker:Render()
+        if picker.MarkCurrentJump then picker.MarkCurrentJump() end
     end)
     grid:SetScript("OnMouseWheel", function(_, delta)
         scrollTo(offset - delta * 2) -- two rows per notch
     end)
 
-    local jumpButtons = {}
+    -- Section buttons: they fill the row, and the one for the section
+    -- you're scrolled to stays lit (Style.SetTabSelected), like a tab.
+    local jumpButtons, shownJumps = {}, {}
+    local function markCurrentJump()
+        local current
+        for _, b in ipairs(shownJumps) do
+            if b.target - 1 <= offset then current = b end
+        end
+        for _, b in ipairs(shownJumps) do
+            ns.Style.SetTabSelected(b, b == current)
+        end
+    end
+    picker.MarkCurrentJump = markCurrentJump
+
     local function rebuildJumps()
         for _, b in ipairs(jumpButtons) do b:Hide() end
-        local x, n = 0, 0
+        shownJumps = {}
         -- Fixed order; only sections that exist get a button.
         local wanted = { { "Raid", "Raid:" }, { "Dungeons", "Dungeons" }, { "Specs", "Specializations" },
             { "Talents", "Talents" }, { "All", "All icons" } }
@@ -325,18 +353,19 @@ function ns.CreateIconPicker(parent, onPick)
                 end
             end
             if target then
-                n = n + 1
+                local n = #shownJumps + 1
                 local b = jumpButtons[n] or CreateFrame("Button", nil, jumpBar, "UIPanelButtonTemplate")
                 jumpButtons[n] = b
-                b:SetSize(72, 20)
-                b:ClearAllPoints()
-                b:SetPoint("LEFT", x + 6, 0)
+                b:SetHeight(22)
                 b:SetText(text)
-                b:SetScript("OnClick", function() scrollTo(target - 1) end)
+                b.target = target
+                b:SetScript("OnClick", function(self) scrollTo(self.target - 1) end)
                 b:Show()
-                x = x + 76
+                shownJumps[n] = b
             end
         end
+        ns.Style.LayoutButtonRow(shownJumps, jumpBar, 6, 0, picker:GetWidth() - 12, 4)
+        markCurrentJump()
     end
 
     local function reload()
@@ -349,6 +378,7 @@ function ns.CreateIconPicker(parent, onPick)
         offset = 0
         bar:SetValue(0)
         picker:Render()
+        markCurrentJump()
     end
 
     -- SearchBoxTemplate has its own OnTextChanged (clear button, hint

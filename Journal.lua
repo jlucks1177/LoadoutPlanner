@@ -203,14 +203,57 @@ end
 -- holds exactly this season's raids and Mythic+ dungeons.
 local seasonCache
 
--- Returns { tierName, raids = {...}, dungeons = {...} }. Each instance:
+-- The journal also lists entries you can't zone into: the expansion's
+-- WORLD BOSSES page (shows up as a "raid" named after the expansion, e.g.
+-- "Midnight") and a "Keystone Dungeons" overview page. Tags on those can
+-- never match where you are, so we leave them out. How we tell:
+--   * the journal hides the difficulty menu for them (10th value false), or
+--   * they have no instance map (11th value 0/nil), or
+--   * they have no bosses, when every real instance does, or
+--   * it's the "Keystone Dungeons" page, by name. It never worked as a tag
+--     (you're never inside it; "All dungeons" is what it meant), and the
+--     checks above alone let it through in some sessions (v0.19).
+function ns.IsKeystonePageName(name)
+    return type(name) == "string" and name:lower():find("keystone", 1, true) ~= nil
+end
+
+local function isPseudoInstance(entry, journalHasBosses)
+    if ns.IsKeystonePageName(entry.name) then return true end
+    if entry.showsDifficulty == false then return true end
+    if not entry.mapID or entry.mapID == 0 then return true end
+    return journalHasBosses and entry.bossCount == 0
+end
+
+-- Bosses of one journal instance. EJ_SelectInstance first: the journal
+-- only reliably lists encounters for the SELECTED instance, which is why
+-- boss icons sometimes went missing (they worked only after the Adventure
+-- Guide had been opened on that raid). We skip selecting while the
+-- Adventure Guide is open, so we never change what it's showing.
+local function readBosses(instanceID)
+    local guideOpen = EncounterJournal and EncounterJournal.IsShown and EncounterJournal:IsShown()
+    if EJ_SelectInstance and not guideOpen then
+        pcall(EJ_SelectInstance, instanceID)
+    end
+    local bosses, b = {}, 1
+    while true do
+        local bossName, _, encounterID = EJ_GetEncounterInfoByIndex(b, instanceID)
+        if not bossName then break end
+        table.insert(bosses, { name = bossName, encounterID = encounterID, label = tostring(b) })
+        b = b + 1
+    end
+    return bosses
+end
+
+-- Returns { tierName, raids = {...}, dungeons = {...}, skipped = {...} }.
+-- Each instance:
 --   { name, icon, mapID, journalID, isRaid, bosses = { { name, icon, encounterID, label } } }
 -- mapID is the same number GetInstanceInfo() reports inside the instance,
 -- which is what lets you tag an instance without being there.
+-- `skipped` lists the journal entries left out (see isPseudoInstance).
 -- Pass true to re-read instead of using the cached copy.
 function ns.GetSeason(refresh)
     if seasonCache and not refresh then return seasonCache end
-    local result = { raids = {}, dungeons = {} }
+    local result = { raids = {}, dungeons = {}, skipped = {} }
     seasonCache = result
     if not (EJ_GetNumTiers and EJ_SelectTier and EJ_GetInstanceByIndex) then
         return result
@@ -219,6 +262,7 @@ function ns.GetSeason(refresh)
     -- EJ_SelectTier changes the journal's selected tier, which the
     -- Encounter Journal window also uses. Remember it and put it back.
     local previousTier = EJ_GetCurrentTier and EJ_GetCurrentTier()
+    local entries, journalHasBosses = {}, false
     local ok, err = pcall(function()
         local tier = EJ_GetNumTiers()
         EJ_SelectTier(tier)
@@ -231,35 +275,17 @@ function ns.GetSeason(refresh)
                 -- button image, lore image, small button image, area map,
                 -- link, shows difficulty, INSTANCE MAP ID (confirmed in
                 -- Blizzard's own Encounter Journal code).
-                local instanceID, name, _, _, buttonImage, _, smallImage, _, _, _, mapID =
+                local instanceID, name, _, _, buttonImage, _, smallImage, _, _, showsDifficulty, mapID =
                     EJ_GetInstanceByIndex(i, isRaid)
                 if not instanceID then break end
+                local bosses = readBosses(instanceID)
                 local entry = {
                     name = name, icon = smallImage or buttonImage, mapID = mapID,
-                    journalID = instanceID, isRaid = isRaid, bosses = {},
+                    journalID = instanceID, isRaid = isRaid, showsDifficulty = showsDifficulty,
+                    bossCount = #bosses, bosses = isRaid and bosses or {},
                 }
-
-                if isRaid then
-                    local b = 1
-                    while true do
-                        local bossName, _, encounterID = EJ_GetEncounterInfoByIndex(b, instanceID)
-                        if not bossName then break end
-                        -- Square achievement icon; the round journal
-                        -- portrait only if no achievement matched.
-                        local icon = ns.GetBossIcon(bossName)
-                        if not icon then
-                            local _, _, _, _, portrait = EJ_GetCreatureInfo(1, encounterID)
-                            icon = portrait
-                        end
-                        table.insert(entry.bosses, {
-                            icon = icon, name = bossName, encounterID = encounterID, label = tostring(b),
-                        })
-                        b = b + 1
-                    end
-                    table.insert(result.raids, entry)
-                else
-                    table.insert(result.dungeons, entry)
-                end
+                journalHasBosses = journalHasBosses or #bosses > 0
+                table.insert(entries, entry)
                 i = i + 1
             end
         end
@@ -269,6 +295,35 @@ function ns.GetSeason(refresh)
     end
     if not ok then
         geterrorhandler()(err)
+    end
+
+    for _, entry in ipairs(entries) do
+        if isPseudoInstance(entry, journalHasBosses) then
+            table.insert(result.skipped, entry)
+        else
+            for _, boss in ipairs(entry.bosses) do
+                -- Square achievement icon; the round journal portrait
+                -- only if no achievement matched.
+                boss.icon = ns.GetBossIcon(boss.name)
+                if not boss.icon and EJ_GetCreatureInfo then
+                    local _, _, _, _, portrait = EJ_GetCreatureInfo(1, boss.encounterID)
+                    boss.icon = portrait
+                end
+            end
+            table.insert(entry.isRaid and result.raids or result.dungeons, entry)
+        end
+    end
+
+    -- A raid with no bosses means the journal wasn't ready: don't keep this
+    -- half-empty result, so the next call reads the journal again.
+    for _, raid in ipairs(result.raids) do
+        if #raid.bosses == 0 then
+            seasonCache = nil
+            break
+        end
+    end
+    if ns.MigratePseudoTags then
+        ns.MigratePseudoTags(result.skipped)
     end
     return result
 end

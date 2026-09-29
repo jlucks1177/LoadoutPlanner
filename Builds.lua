@@ -29,8 +29,11 @@ function ns.GetGroups()
     return ns.buildDB and ns.buildDB.groups or {}
 end
 
+-- Builds that aren't in your library (a Top builds row, a Blizzard loadout
+-- applied as a code) have no id, so they're keyed by their talent code.
 function ns.ItemFromBuild(build)
-    return { key = "b:" .. build.id, name = build.name, build = build }
+    local key = build.id and ("b:" .. build.id) or ("t:" .. tostring(build.code))
+    return { key = key, name = build.name, build = build }
 end
 
 -- Custom builds for one spec, in display order.

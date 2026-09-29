@@ -17,6 +17,8 @@ local M = {}
 -- Lua 5.2+ moved unpack into table. WoW is 5.1, but the tests should run
 -- on whatever Lua you have installed.
 unpack = unpack or table.unpack
+-- WoW has a "bit" library (bit operations); plain Lua doesn't.
+bit = bit or { lshift = function(a, n) return (a * 2 ^ n) % 2 ^ 32 end }
 
 M.created = {}   -- every fake frame/texture, in creation order
 M.templates = {} -- template name -> how many times CreateFrame used it
@@ -127,6 +129,7 @@ function M.install(opts)
     end
     C_AddOns = { IsAddOnLoaded = function() return false end }
     time = os.time
+    strtrim = strtrim or function(text) return (tostring(text or ""):match("^%s*(.-)%s*$")) end
     geterrorhandler = function() return function(e) error(e, 2) end end
     InCombatLockdown = function() return false end
     hooksecurefunc = function() end

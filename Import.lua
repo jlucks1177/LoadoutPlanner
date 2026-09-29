@@ -12,7 +12,10 @@
 --                                as if you had clicked them yourself.
 --        COMMIT (double click) - stage, then apply ("Changing Talents"
 --                                cast). The result saves into whichever
---                                Blizzard loadout you have selected.
+--                                Blizzard loadout you have selected: a
+--                                custom build is applied ONTO your active
+--                                Blizzard loadout (by design: Blizzard
+--                                loadouts are the slots, builds fill them).
 --      Staging then clicking Blizzard's own Apply Changes button is the
 --      safest path: committing from addon code can taint the talent UI and
 --      break action-bar keybinds (WoWUIBugs #447).
@@ -295,8 +298,11 @@ function ns.StageBuild(build)
     local configID = stage(build)
     if not configID then return end
     if C_Traits.ConfigHasStagedChanges(configID) then
+        local selected = ns.GetSelectedConfigID()
+        local info = selected and not ns.IsStarterBuild(selected) and C_Traits.GetConfigInfo(selected)
         ns.Print(("|cffffd100%s|r is on the talent screen. Click |cffffffffApply Changes|r "
-            .. "(or double-click the build) to apply it."):format(build.name))
+            .. "(or double-click the build) to apply it%s."):format(build.name,
+            info and (" to your |cffffffff" .. info.name .. "|r loadout") or ""))
     else
         ns.Print(("|cffffd100%s|r already matches your talents."):format(build.name))
     end
@@ -342,7 +348,7 @@ function ns.ApplyBuild(build)
     local info = selected and C_Traits.GetConfigInfo(selected)
     ns.ExpectLoad(build.name)
     ns.Print(("Applying |cffffd100%s|r%s..."):format(build.name,
-        info and (" to loadout |cffffffff" .. info.name .. "|r") or ""))
+        info and (" to your |cffffffff" .. info.name .. "|r loadout") or ""))
     ns.Notify()
 end
 

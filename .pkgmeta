@@ -4,7 +4,10 @@ package-as: LoadoutPlanner
 
 ignore:
   - tools
-  - LEARNING.md
-  - PUBLISHING.md
   - VERSION
   - CLAUDE.md
+
+# The release notes CurseForge and GitHub show for each version.
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown

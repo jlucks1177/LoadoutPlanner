@@ -10,8 +10,9 @@
 --     loadout lists and the PvP talent list.
 --   * talents-pvpflyout-rowhighlight: the gold glow when you hover a PvP
 --     talent in the talent window.
---   * talents-node-pvpflyout-green / -yellow: the PvP talent icon rings
---     (green normally, gold when selected).
+--   * talents-node-pvpflyout-yellow: the PvP talent list's GOLD ring, for
+--     the build you're using; everything else gets the talent tree's GREY
+--     square (talents-node-square-gray), like an unlearned talent.
 --
 -- Every helper checks that the template or atlas exists and falls back to
 -- plain textures if not, so a renamed asset in a future patch makes the
@@ -162,7 +163,18 @@ local function showSlice(texture, atlas)
     return true
 end
 
-function Style.AddSpecArt(frame)
+-- opts.solid: also paint a dark base under the art. Blizzard's flat panel
+-- is see-through, which the main window hides with its art; a dialog that
+-- floats over the talent tree (the build editor, Top builds) needs the base
+-- so the tree doesn't show through when the art is turned down or missing.
+function Style.AddSpecArt(frame, opts)
+    if opts and opts.solid then
+        local base = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
+        base:SetPoint("TOPLEFT", 6, -21)
+        base:SetPoint("BOTTOMRIGHT", -2, 2)
+        base:SetColorTexture(0.03, 0.03, 0.04, 0.96)
+        frame.solidBase = base
+    end
     local art = frame:CreateTexture(nil, "BACKGROUND", nil, 2)
     art:SetPoint("TOPLEFT", 6, -21)
     art:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -219,8 +231,10 @@ function Style.CreateScrollFrame(parent, name)
         return CreateFrame("ScrollFrame", name, parent, "UIPanelScrollFrameTemplate")
     end
     local scroll = CreateFrame("ScrollFrame", name, parent)
-    bar:SetPoint("TOPLEFT", scroll, "TOPRIGHT", 6, 0)
-    bar:SetPoint("BOTTOMLEFT", scroll, "BOTTOMRIGHT", 6, 0)
+    -- Inset a few pixels top and bottom so the arrows sit clearly inside
+    -- the list's area rather than flush with its edges.
+    bar:SetPoint("TOPLEFT", scroll, "TOPRIGHT", 6, -4)
+    bar:SetPoint("BOTTOMLEFT", scroll, "BOTTOMRIGHT", 6, 4)
     ScrollUtil.InitScrollFrameWithScrollBar(scroll, bar)
     scroll:EnableMouseWheel(true)
     scroll.ScrollBar = bar
@@ -247,12 +261,48 @@ function Style.AddRowBackground(button)
     return bg
 end
 
--- A talent-node ring around an icon: green normally, gold when active.
+-- A talent-node ring around an icon: GREY normally, GOLD when active
+-- (the build whose talents you have right now).
 -- Returns the ring; call Style.SetIconActive(ring, true/false).
+local RING_ACTIVE = "talents-node-pvpflyout-yellow"
+-- First one that exists wins: the tree's grey square node, the choice
+-- flyout's grey square, then the dimmed gold ring as a last resort.
+-- (Square, to match the gold ring's shape; the circles looked wrong.)
+local RING_IDLE_CHOICES = { "talents-node-square-gray", "talents-node-choiceflyout-square-gray",
+    "talents-node-pvpflyout-yellow-dimmed" }
+local ringIdle
+local function idleAtlas()
+    if not ringIdle then
+        for _, atlas in ipairs(RING_IDLE_CHOICES) do
+            if atlasExists(atlas) then ringIdle = atlas break end
+        end
+    end
+    return ringIdle
+end
+
+-- How far the ring reaches past the icon on each side. Blizzard's ring art
+-- has its frame INSIDE the square, so a ring exactly the icon's size left
+-- the icon's corners poking out. A slightly bigger ring, plus a mask that
+-- rounds the icon's corners (as the talent window does), fixes that.
+local RING_OUTSET = 3
+local ICON_MASK = "talents-node-choiceflyout-mask"
+
 function Style.AddIconBorder(owner, icon)
     local ring = owner:CreateTexture(nil, "OVERLAY")
-    ring:SetAllPoints(icon)
-    if not Style.SetAtlas(ring, "talents-node-pvpflyout-green") then
+    ring:SetPoint("TOPLEFT", icon, "TOPLEFT", -RING_OUTSET, RING_OUTSET)
+    ring:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", RING_OUTSET, -RING_OUTSET)
+    -- Round the icon's corners so nothing sticks out past the ring.
+    if atlasExists(ICON_MASK) and owner.CreateMaskTexture and icon.AddMaskTexture then
+        local mask = owner:CreateMaskTexture()
+        mask:SetAtlas(ICON_MASK)
+        mask:SetAllPoints(icon)
+        icon:AddMaskTexture(mask)
+        ring.mask = mask
+    end
+    local idle = idleAtlas()
+    if idle and atlasExists(RING_ACTIVE) then
+        ring:SetAtlas(idle)
+    else
         ring:Hide()
         ring.missing = true
     end
@@ -261,7 +311,7 @@ end
 
 function Style.SetIconActive(ring, active)
     if ring.missing then return end
-    ring:SetAtlas(active and "talents-node-pvpflyout-yellow" or "talents-node-pvpflyout-green")
+    ring:SetAtlas(active and RING_ACTIVE or idleAtlas())
 end
 
 -- The talent window's checkmark.
@@ -273,7 +323,7 @@ end
 
 -- Section headers: a dark band, a gold rule underneath, and the
 -- friends-list arrow (right = collapsed, down = open).
-function Style.StyleHeader(header)
+function Style.StyleHeader(header, static)
     local bg = header:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints()
     bg:SetColorTexture(0, 0, 0, 0.5)
@@ -287,7 +337,51 @@ function Style.StyleHeader(header)
         rule:SetColorTexture(1, 0.82, 0, 0.35)
     end
     header.rule = rule
-    Style.SetRowHighlight(header)
+    if not static then
+        Style.SetRowHighlight(header) -- only clickable headers glow on hover
+    end
+end
+
+-- A section title that looks like the main window's group headers (dark
+-- band, gold rule, gold text) but isn't clickable. Used to split the build
+-- editor and Top builds into the same kind of sections as the main list.
+Style.HEADER_HEIGHT = 22
+function Style.CreateSectionHeader(parent, text)
+    local header = CreateFrame("Frame", nil, parent)
+    header:SetHeight(Style.HEADER_HEIGHT)
+    Style.StyleHeader(header, true)
+    header.text = header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    header.text:SetPoint("LEFT", 8, 0)
+    header.text:SetPoint("RIGHT", -8, 0)
+    header.text:SetJustifyH("LEFT")
+    header.text:SetText(text)
+    return header
+end
+
+-- Buttons that act as tabs (Top builds' M+/LFR/..., the icon sections).
+-- The chosen one keeps its gold hover glow and can't be re-clicked; the
+-- rest look like normal buttons. (Greying out the chosen tab, as v0.18
+-- did, made it look unavailable instead of selected.)
+function Style.SetTabSelected(button, selected)
+    button.isSelectedTab = selected
+    if selected then
+        button:LockHighlight()
+    else
+        button:UnlockHighlight()
+    end
+end
+
+-- Lay out `buttons` side by side to exactly fill `width` (from `x`, `y`
+-- inside `parent`), with `gap` pixels between them.
+function Style.LayoutButtonRow(buttons, parent, x, y, width, gap)
+    local count = #buttons
+    if count == 0 then return end
+    local each = math.floor((width - gap * (count - 1)) / count)
+    for i, button in ipairs(buttons) do
+        button:ClearAllPoints()
+        button:SetPoint("TOPLEFT", parent, "TOPLEFT", x + (i - 1) * (each + gap), y)
+        button:SetWidth(each)
+    end
 end
 
 function Style.SetToggle(texture, collapsed)

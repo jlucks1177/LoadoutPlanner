@@ -35,6 +35,12 @@ ns.On("ADDON_LOADED", function(loadedName)
     ns.db = db
 end)
 
+-- Once you're in the world (saved settings are loaded by then), fix any
+-- old "Keystone Dungeons" tags right away, before anything reads them.
+ns.On("PLAYER_LOGIN", function()
+    pcall(ns.MigratePseudoTags, {})
+end)
+
 -- Get (or create) the tag tables for a spec. Tags are per spec because
 -- loadouts are per spec: your Holy build means nothing to Retribution.
 function ns.GetSpecData(specID)
@@ -187,6 +193,54 @@ function ns.GetTagsForItem(itemKey)
         return a.label < b.label
     end)
     return result
+end
+
+------------------------------------------------------------------------
+-- Moving tags off journal pages you can't enter (v0.19)
+------------------------------------------------------------------------
+-- Older versions let you tag the journal's "Keystone Dungeons" page as if
+-- it were a dungeon. You can never be inside it, so those tags never
+-- matched. What people meant was "every dungeon", so move each one to the
+-- matching "All dungeons" tag (same difficulty), unless that tag is
+-- already taken. `skipped` comes from ns.GetSeason (Journal.lua).
+-- Also runs at login with no journal data at all: a tag LABELLED
+-- "Keystone Dungeons" is moved on its name alone (ns.IsKeystonePageName),
+-- so old tags get fixed even if the journal hasn't been read yet.
+function ns.MigratePseudoTags(skipped)
+    if not ns.db then return end
+    skipped = skipped or {}
+    local pseudoIDs, pseudoNames = {}, {}
+    for _, entry in ipairs(skipped) do
+        if not entry.isRaid then -- dungeon pages only; world bosses stay as they are
+            if entry.mapID and entry.mapID ~= 0 then pseudoIDs[entry.mapID] = true end
+            if entry.name then pseudoNames[entry.name:lower()] = true end
+        end
+    end
+    local category = ns.CATEGORY_BY_ID and ns.CATEGORY_BY_ID.party
+    local moved = 0
+    for _, spec in pairs(ns.db.specs or {}) do
+        spec.categories = spec.categories or {}
+        for key, ref in pairs(spec.instances or {}) do
+            local id = tonumber(tostring(key):match("^(%d+)"))
+            local isPseudo = (id and pseudoIDs[id]) or (ref.label and pseudoNames[ref.label:lower()])
+                or (ns.IsKeystonePageName and ns.IsKeystonePageName(ref.label))
+            if isPseudo then
+                local newKey = ns.TagKey("party", ref.difficulty)
+                if not spec.categories[newKey] then
+                    ref.label = category and category.label or "All dungeons"
+                    ref.icon = category and category.icon or ref.icon
+                    spec.categories[newKey] = ref
+                    moved = moved + 1
+                end
+                spec.instances[key] = nil -- modifying existing keys during pairs() is allowed
+            end
+        end
+    end
+    if moved > 0 then
+        ns.Print(("Moved %d tag(s) from the journal's \"Keystone Dungeons\" page to |cffffd100All dungeons|r, "
+            .. "so they work in every dungeon."):format(moved))
+        ns.Notify()
+    end
 end
 
 ------------------------------------------------------------------------

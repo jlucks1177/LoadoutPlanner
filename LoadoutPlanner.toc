@@ -1,9 +1,8 @@
 ## Interface: 120100
 ## Title: LoadoutPlanner
 ## Notes: Tag talent loadouts to dungeons and raid bosses, and get offered the right build at the right time.
-## Author: Joe
 ## Version: @project-version@
-## OptionalDeps: LoadoutPlannerData, ArchonTalentsData, PeaversTalentsData
+## OptionalDeps: LoadoutPlannerData, ArchonTalentsData, PeaversTalentsData, Simulationcraft
 ## SavedVariables: LoadoutPlannerBuilds
 ## SavedVariablesPerCharacter: LoadoutPlannerDB
 
@@ -29,3 +28,4 @@ TagPanel.lua
 Archon.lua
 TopBuilds.lua
 UI.lua
+Simc.lua
