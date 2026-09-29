@@ -1,8 +1,12 @@
 # Daily builds
-# Every morning: fetch the most-played talent builds, put them inside the
-# addon (Data/Builtin.lua), and if anything changed, publish a new release to
-# GitHub, CurseForge and Wago. Players get the new builds through their
-# addon manager with no setup of their own.
+# Every morning: fetch the most-played talent builds (parses.gg, top 10% of
+# players), put them inside the addon (Data/Builtin.lua), and commit them if
+# they changed.
+#
+# PUBLISHING IS OPT-IN: this job only releases to GitHub/CurseForge/Wago when
+# the repository variable AUTO_RELEASE is "true". Otherwise nothing reaches
+# players until YOU push a version tag (release.yml), and that release
+# includes the newest builds committed here.
 #
 # Also runnable by hand: Actions tab -> "Daily builds" -> "Run workflow".
 
@@ -51,8 +55,8 @@ jobs:
       - name: Fetch today's builds
         working-directory: tools/sync
         env:
-          # Raider.IO data is only included once you set the repository
-          # variable INCLUDE_RAIDERIO to true (after Raider.IO says yes).
+          # Raider.IO data would only be added if the repository variable
+          # INCLUDE_RAIDERIO were "true". It's deliberately left off.
           RAIDERIO_API_KEY: ${{ secrets.RAIDERIO_API_KEY }}
           SOURCES: ${{ vars.INCLUDE_RAIDERIO == 'true' && 'parses,raiderio' || 'parses' }}
         run: node src/sync.js --bundle "$GITHUB_WORKSPACE" --sources "$SOURCES"
@@ -73,8 +77,19 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit and tag the new version
+      - name: Commit the new builds
         if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Data/Builtin.lua
+          git commit -m "Daily builds $(date -u +%Y-%m-%d)"
+          git push origin HEAD
+
+      # Everything below only runs when you've opted in to automatic
+      # releases (repository variable AUTO_RELEASE = true).
+      - name: Tag the new version
+        if: steps.diff.outputs.changed == 'true' && vars.AUTO_RELEASE == 'true'
         run: |
           base="$(tr -d '[:space:]' < VERSION)"
           tag="v${base}.$(date -u +%Y%m%d)"
@@ -82,16 +97,12 @@ jobs:
           if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
             tag="${tag}.$(date -u +%H%M)"
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Data/Builtin.lua
-          git commit -m "Daily builds $(date -u +%Y-%m-%d)"
           git tag -a "$tag" -m "Daily talent builds $(date -u +%Y-%m-%d)"
-          git push origin HEAD "$tag"
+          git push origin "$tag"
           echo "Tagged $tag"
 
       - name: Project IDs for CurseForge and Wago
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.diff.outputs.changed == 'true' && vars.AUTO_RELEASE == 'true'
         id: ids
         run: |
           args=""
@@ -102,7 +113,7 @@ jobs:
       # Tags pushed by this workflow don't start other workflows (a GitHub
       # rule), so the release is built right here.
       - name: Package and release
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.diff.outputs.changed == 'true' && vars.AUTO_RELEASE == 'true'
         uses: BigWigsMods/packager@v2
         with:
           args: ${{ steps.ids.outputs.args }}
