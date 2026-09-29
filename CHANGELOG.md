@@ -20,7 +20,7 @@
 - Build editor (Import / Edit) redesigned to match the main window. It has a solid background with your spec art, and Talents, Details and Choose an icon sections under gold-lined headers. The chosen icon is shown in a gold ring, and Save and Cancel sit on the bottom bar. The window no longer shows the talent tree through it.
 - Icon picker: every icon has a ring (gold = chosen), section titles have header bands, and the section buttons fill the row and light up for the section you're scrolled to.
 - Top builds redesigned the same way: a solid background with spec art, full-width difficulty tabs (the selected one stays lit instead of greying out), rows the same size as the main list, and the hint on the bottom bar. It can be dragged by its title bar.
-- Main window: the list and its scroll bar now stop above the bottom-bar art, and the Import / Save current / New group buttons fit inside the border.
+- Main window: the list and its scroll bar now stop above the bottom-bar art. The Import / Save current / New group buttons fit inside the border, and their labels use Blizzard's small button font so each one fits its button.
 - Fixed the **...** options button disappearing under the title bar.
 
 ### Zone-in prompts
@@ -33,7 +33,9 @@
 - Journal pages that aren't real instances (world bosses, "Keystone Dungeons") are no longer listed as raids or dungeons.
 - New `/lp journal` command lists this season's raids and dungeons as the game reports them.
 
-### Top builds
+### Top builds (work in progress)
+> Top builds is still a work in progress. The data source and how builds are chosen may change in future versions, and the suggestions may not always match what top players are running right now.
+
 - Built-in builds now come from the **top 10% of players** on parses.gg, falling back to all players where too few top players logged a fight. Rows say "top players" or "players" accordingly.
 - The Archon button is replaced by a link button naming the source each build comes from. "Compare on Archon..." moved to the right-click menu.
 - The source buttons only appear when more than one source has data.

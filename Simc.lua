@@ -67,23 +67,14 @@ function ns.AddBuildsToSimcProfile(profile)
     local specID = ns.GetSpecID and ns.GetSpecID()
     if not specID then return profile end
 
-    -- Every build is listed, even when its talents match another loadout
-    -- under a different name (you asked for each name to show on Raidbots).
-    -- Only an exact repeat, same name AND same talents, is skipped, so a
-    -- build that mirrors a Blizzard loadout of the same name isn't doubled.
-    local present = {}
-    for name, code in body:gmatch("# Saved Loadout: ([^\n]*)\n# talents=([%w+/=]+)") do
-        present[name .. "\n" .. code] = true
-    end
-
+    -- Every build for this spec is listed, with no de-duplication: even if
+    -- its talents (or its name and talents) match another loadout, each one
+    -- shows on Raidbots.
     local added = {}
     for _, build in ipairs(ns.GetBuildsForSpec(specID)) do
         local code = build.code
-        local name = cleanName(build.name)
-        local key = name .. "\n" .. tostring(code)
-        if type(code) == "string" and code ~= "" and not present[key] then
-            present[key] = true
-            table.insert(added, "# Saved Loadout: " .. name)
+        if type(code) == "string" and code ~= "" then
+            table.insert(added, "# Saved Loadout: " .. cleanName(build.name))
             table.insert(added, "# talents=" .. code)
         end
     end
