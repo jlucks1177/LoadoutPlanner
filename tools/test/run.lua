@@ -43,6 +43,8 @@ local tests = {
     "tools/test/test_topbuilds.lua",
     "tools/test/test_tags.lua",
     "tools/test/test_simc.lua",
+    "tools/test/test_importdialog.lua",
+    "tools/test/test_bossprompt.lua",
 }
 local failed = syntaxOK and 0 or 1
 for _, test in ipairs(tests) do

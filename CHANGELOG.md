@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.20.0
+
+### New: apply an imported code to your current loadout
+- Blizzard's talent **Import** dialog (loadout dropdown → Import) has a new checkbox under it: "Apply to my current loadout instead". Ticked, the pasted code is applied onto the Blizzard loadout you have selected, the same way LoadoutPlanner applies your custom builds, instead of creating a new loadout.
+- Unticked (the default), Blizzard's Import works exactly as before.
+- If the code can't be used (wrong spec, outdated), the reason is shown under the checkbox and the dialog stays open. The option is disabled while the Starter Build is selected.
+
+### New: save your current talents over a build
+- Right-click a custom build → **Save current talents here** replaces its saved talents with what's on your talent screen now, including changes you haven't applied yet. It asks before overwriting.
+- The build keeps its name, icon, group and tags.
+- **Save current** now also picks up pending (not yet applied) talent changes.
+
+### New: a prompt for each boss
+- With boss tags, you're now prompted through the raid, not just when you enter. On reaching a new **map area**, you're offered the build for the next living boss there, and **after each kill**, the next one.
+- The prompt lists that boss's build first, then at most two later bosses' builds, marked "Only if you're using a different kill order". If the next boss has no build tagged, there's no prompt.
+- Re-entering an area whose boss is still alive offers its build again, every time (not twice within 10 seconds). No prompt if you already have that boss's build, never in combat, and not after a wipe.
+- On by default; turn it off in the **...** menu ("Prompt for each boss"). `/lp why` shows your map area, the bosses there, and which boss is next.
+
+### Prompt window
+- The "Change talents for ...?" window now sizes itself to its contents: rows grow when their text wraps, and nothing is cut off with "..." or overlaps the Keep button. It's a little wider, with larger icons.
+
+### Fixed
+- Builds tagged to a specific dungeon (or raid) weren't offered when you entered it if your active Blizzard loadout was tagged **All dungeons** (or **All raids**). Your active loadout always matches your talents, because custom builds save into it, so the addon thought you were already set. Now, when a place has builds of its own, only those count as "already wearing it".
+
+### Repository
+- `.gitignore` now really ignores `luac.out` (the line was saved in the wrong text encoding), and keeps the old LEARNING.md / PUBLISHING.md guides out.
+- New tests: the Import-dialog checkbox, "Save current talents here", the dungeon-prompt fix, and boss-by-boss prompts (a simulated raid night).
+
 ## v0.19.0
 
 ### New: your builds in the SimulationCraft export (Raidbots)

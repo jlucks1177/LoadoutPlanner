@@ -275,6 +275,10 @@ local function openOptions(owner)
         root:CreateButton((simcOn and "|cff40ff40[x]|r " or "[  ] ") .. "Add my builds to the SimulationCraft export", function()
             ns.db.simcExport = not simcOn
         end)
+        local bossOn = ns.db.bossPrompts ~= false -- default on
+        root:CreateButton((bossOn and "|cff40ff40[x]|r " or "[  ] ") .. "Prompt for each boss (new map area / after a kill)", function()
+            ns.db.bossPrompts = not bossOn
+        end)
         local barOn = ns.db.showTalentTabBar
         root:CreateButton((barOn and "|cff40ff40[x]|r " or "[  ] ") .. "Spec buttons on talent tab too", function()
             ns.db.showTalentTabBar = not ns.db.showTalentTabBar
@@ -320,9 +324,9 @@ local importButton = actionButton("Import", function()
     ns.OpenEditor({})
 end)
 local saveButton = actionButton("Save current", function()
-    -- Export your CURRENT talents (the active config) as a code.
-    local ok, code = pcall(C_Traits.GenerateImportString, C_ClassTalents.GetActiveConfigID())
-    ns.OpenEditor({ code = ok and code or "" })
+    -- Your CURRENT talents as a code: what the talent screen shows,
+    -- pending changes included (ns.CurrentTalentCode, Builds.lua).
+    ns.OpenEditor({ code = ns.CurrentTalentCode() or "" })
 end)
 local groupButton = actionButton("New group", function()
     StaticPopup_Show("LOADOUTPLANNER_NEW_GROUP")

@@ -82,6 +82,7 @@ local function bossKilled(journalEncounterID, difficultyID)
     end)
     return ok and killed or false
 end
+ns.IsBossKilled = bossKilled -- BossPrompt.lua uses it too
 
 -- All instance tags in one spec's tag table that belong to `instance`,
 -- as { ref, difficulty } (difficulty nil = "any difficulty").
@@ -119,19 +120,23 @@ end
 -- on Normal, and raid difficulty is set before you zone in.
 -- specTable defaults to your current spec. For OTHER specs, items can't
 -- be resolved (Blizzard loadouts belong to a spec), so only `ref` is set.
-function ns.GetCandidates(instance, skipKilled, specTable)
+-- noBosses: leave boss tags out (the zone-in prompt does, when the
+-- boss-by-boss prompts in BossPrompt.lua are handling them).
+function ns.GetCandidates(instance, skipKilled, specTable, noBosses)
     local list, seen = {}, {}
     local isCurrentSpec = (specTable == nil)
     specTable = specTable or ns.GetSpecData()
     if not (instance and specTable) then return list end
 
-    local function add(ref, label)
+    -- general: an "All dungeons" / "All raids" tag rather than one for
+    -- this place or one of its bosses (see CheckContext for why it matters).
+    local function add(ref, label, general)
         if not ref then return end
         local item = isCurrentSpec and ns.ResolveRef(ref) or nil
         local key = item and item.key or (ref.buildID or ref.configID or ref.name)
         if (item or not isCurrentSpec) and not seen[key] then
             seen[key] = true
-            table.insert(list, { item = item, ref = ref, label = label })
+            table.insert(list, { item = item, ref = ref, label = label, general = general or nil })
         end
     end
 
@@ -169,15 +174,15 @@ function ns.GetCandidates(instance, skipKilled, specTable)
         end
         if instance.difficulty and instance.difficulty ~= MYTHIC_PLUS then
             add(categoryTag(instance.difficulty),
-                ("%s, %s"):format(category.label, difficulty and difficulty.name or "this difficulty"))
+                ("%s, %s"):format(category.label, difficulty and difficulty.name or "this difficulty"), true)
         end
         if instance.type == "party" then
-            add(categoryTag(MYTHIC_PLUS), category.label .. ", Mythic+")
+            add(categoryTag(MYTHIC_PLUS), category.label .. ", Mythic+", true)
         end
-        add(categoryTag(nil), category.label .. ", any difficulty")
+        add(categoryTag(nil), category.label .. ", any difficulty", true)
         if isDungeon then
             for _, other in ipairs(ns.DIFFICULTIES.party) do
-                add(categoryTag(other.id), ("%s, %s tag"):format(category.label, other.name))
+                add(categoryTag(other.id), ("%s, %s tag"):format(category.label, other.name), true)
             end
         end
     end
@@ -185,6 +190,7 @@ function ns.GetCandidates(instance, skipKilled, specTable)
     -- Reading bosses touches the Encounter Journal; if that fails for any
     -- reason, still offer the instance's builds rather than nothing.
     local ok, bosses = pcall(ns.GetCurrentBosses)
+    if noBosses then ok = false end
     for i, boss in ipairs(ok and bosses or {}) do
         if not (skipKilled and bossKilled(boss.id, instance.rawDifficulty)) then
             local bossTags = specTable.bosses or {}
@@ -237,6 +243,7 @@ function ns.CheckContext(attempt)
     local instance = ns.GetCurrentInstance()
     if not instance then
         promptedKey = nil -- left the instance; allow a fresh prompt next time
+        if ns.ResetBossPrompts then ns.ResetBossPrompts() end
         ns.HideZonePrompt()
         return
     end
@@ -253,7 +260,18 @@ function ns.CheckContext(attempt)
 
     -- Only builds tagged in the spec you're IN are ever offered: tags are
     -- per spec, and GetCandidates reads only this spec's tags.
-    local candidates = ns.GetCandidates(instance, true)
+    -- Boss tags are handled boss by boss (BossPrompt.lua) when that's on:
+    -- if the next boss has a build, that prompt comes first and lists this
+    -- place's own builds under it.
+    local bossPrompts = ns.TryBossPrompt and not (ns.db and ns.db.bossPrompts == false)
+    local candidates = ns.GetCandidates(instance, true, nil, bossPrompts)
+    if bossPrompts then
+        if ns.NoteBossMap then ns.NoteBossMap() end
+        if ns.TryBossPrompt(instance, candidates) then
+            promptedKey = key
+            return
+        end
+    end
     if #candidates == 0 then
         promptedKey = key
         -- Optional (off by default since v0.19): if another spec has builds
@@ -268,10 +286,23 @@ function ns.CheckContext(attempt)
     end
 
     -- If you already have one of the tagged builds, there's nothing to ask.
+    -- But when this place has builds of its OWN (tagged to it or its
+    -- bosses), wearing your general "All dungeons/raids" build doesn't
+    -- count: that's usually your active Blizzard loadout, which always
+    -- matches your talents because custom builds save into it. Counting it
+    -- hid every dungeon's own build (fixed in v0.20).
     -- ItemMatchesCurrent returns nil while talent data is still loading
     -- after the loading screen: wait and try again instead of guessing.
+    local hasOwn = false
     for _, candidate in ipairs(candidates) do
-        local matches = ns.ItemMatchesCurrent(candidate.item)
+        if not candidate.general then hasOwn = true break end
+    end
+    for _, candidate in ipairs(candidates) do
+        -- (Not `cond and false or x`: in Lua that always gives x.)
+        local matches = false
+        if not (hasOwn and candidate.general) then
+            matches = ns.ItemMatchesCurrent(candidate.item)
+        end
         if matches == nil and attempt < MAX_ATTEMPTS then
             C_Timer.After(2, function() ns.CheckContext(attempt + 1) end)
             return
@@ -332,6 +363,7 @@ ns.commands.why = function()
     for id in pairs(instance.ids) do table.insert(ids, tostring(id)) end
     print("  Instance IDs checked: " .. table.concat(ids, ", ") .. " (plus any tag labeled \"" .. instance.name .. "\")")
 
+    if ns.PrintBossStatus then ns.PrintBossStatus(instance) end
     local candidates = ns.GetCandidates(instance, true)
     if #candidates == 0 then
         print("  No builds are tagged for this instance/difficulty in your current spec.")
@@ -352,10 +384,16 @@ ns.commands.why = function()
         end
         return
     end
+    local hasOwn = false
+    for _, candidate in ipairs(candidates) do
+        if not candidate.general then hasOwn = true break end
+    end
     for _, candidate in ipairs(candidates) do
         local matches = ns.ItemMatchesCurrent(candidate.item)
-        print(("  %s -> %s: %s"):format(candidate.label, candidate.item.name,
-            matches == nil and "can't compare yet" or (matches and "you already have it" or "different from your talents")))
+        local note = (hasOwn and candidate.general and matches)
+            and " (general tag: doesn't stop the prompt, since this place has its own builds)" or ""
+        print(("  %s -> %s: %s%s"):format(candidate.label, candidate.item.name,
+            matches == nil and "can't compare yet" or (matches and "you already have it" or "different from your talents"), note))
     end
 end
 

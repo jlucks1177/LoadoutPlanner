@@ -324,12 +324,14 @@ ns.On("TRAIT_CONFIG_UPDATED", function()
 end)
 
 -- Double click (and /lp load, and the zone-in prompt): stage + apply.
+-- Returns true if the change was sent (or nothing needed changing), and
+-- nil after printing why not, so callers can keep their window open.
 function ns.ApplyBuild(build)
     local configID = stage(build)
     if not configID then return end
     if not C_Traits.ConfigHasStagedChanges(configID) then
         ns.Print(("|cffffd100%s|r already matches your talents."):format(build.name))
-        return
+        return true
     end
 
     -- C_Traits.CommitConfig on the ACTIVE config is the call Talent Loadout
@@ -350,6 +352,7 @@ function ns.ApplyBuild(build)
     ns.Print(("Applying |cffffd100%s|r%s..."):format(build.name,
         info and (" to your |cffffffff" .. info.name .. "|r loadout") or ""))
     ns.Notify()
+    return true
 end
 
 ------------------------------------------------------------------------

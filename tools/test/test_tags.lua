@@ -202,4 +202,93 @@ ns.commands.prompt()
 wow.check(specPrompted, "the other-spec offer still works when turned on in options")
 ns.db.promptOtherSpecs = nil
 
+------------------------------------------------------------------------
+-- 6b. Wearing your GENERAL build doesn't hide a SPECIFIC one
+------------------------------------------------------------------------
+-- The bug: your active Blizzard loadout (M+) is tagged All dungeons, and
+-- since custom builds save INTO it, it always matches your talents. The
+-- "you already have a tagged build" check then fired in every dungeon,
+-- and your Murder Row build was never offered in Murder Row.
+ns.SaveBuild({ name = "Murder Row build", code = "MMMM", specID = 102 }, "Dungeons")
+local murder
+for _, b in ipairs(ns.FindGroup("Dungeons").builds) do if b.name == "Murder Row build" then murder = b end end
+spec.instances = { ["2813"] = { buildID = murder.id, name = murder.name, label = "Murder Row" } }
+spec.categories = { party = { buildID = mplus.id, name = mplus.name, label = "All dungeons" } }
+spec.bosses = {}
+GetInstanceInfo = function() return "Murder Row", "party", 23, "", 5, 0, false, 2813 end
+local offered
+ns.ShowZonePrompt = function(_, candidates) offered = candidates end
+local wearing
+ns.ItemMatchesCurrent = function(item) return item.build == wearing end
+
+wearing, offered = mplus, nil
+ns.commands.prompt()
+wow.check(offered ~= nil and offered[1].item.build == murder,
+    "wearing your All dungeons build, the dungeon's own build is still offered (first)")
+
+wearing, offered = murder, nil
+ns.commands.prompt()
+wow.check(offered == nil, "wearing the dungeon's own build: no prompt")
+
+-- Only a general tag here, and you're wearing it: nothing to offer.
+spec.instances = {}
+wearing, offered = mplus, nil
+ns.commands.prompt()
+wow.check(offered == nil, "only an All dungeons build tagged, and you're wearing it: no prompt")
+ns.ItemMatchesCurrent = realMatches
+
+------------------------------------------------------------------------
+-- 7. Right-click a build: "Save current talents here"
+------------------------------------------------------------------------
+-- Codes whose header says which spec they're for (first letter F = Feral).
+ExportUtil = { MakeImportDataStream = function(code) return {
+    GetNumberOfBits = function() return 999 end,
+    ExtractValue = function(_, bits)
+        if bits == 8 then return 2 end
+        return code:sub(1, 1) == "F" and 103 or 102
+    end } end }
+local onScreen = "NEWTALENTS"
+PlayerSpellsFrame.TalentsFrame.shown = true
+PlayerSpellsFrame.TalentsFrame.GetLoadoutExportString = function() return onScreen end
+C_Traits.GenerateImportString = function() return "COMMITTEDONLY" end
+wow.check(ns.CurrentTalentCode() == "NEWTALENTS",
+    "\"current talents\" means what the talent screen shows, pending changes included")
+
+-- The menu entry asks first, then overwrites.
+local window = _G.LoadoutPlannerWindow
+PlayerSpellsFrame.shown = true
+window.shown = false
+window:Show()
+ns.Notify()
+local row
+for _, o in ipairs(wow.created) do
+    if o.item and o.item.build == mplus and o.scripts and o.scripts.OnClick then row = o end
+end
+wow.check(row ~= nil, "the build has a row in the list")
+row.scripts.OnClick(row, "RightButton")
+local entry
+for _, menuItem in ipairs(wow.lastMenu) do
+    if type(menuItem) == "table" and menuItem.text == "Save current talents here" then entry = menuItem end
+end
+wow.check(entry ~= nil, "a custom build's right-click menu has \"Save current talents here\"")
+wow.popups = {}
+entry.fn()
+local popup = wow.popups[1]
+wow.check(popup and popup.which == "LOADOUTPLANNER_OVERWRITE_BUILD" and popup.data == mplus and mplus.code == "AAAA",
+    "it asks before overwriting (nothing changes yet)")
+
+local oldName, oldID = mplus.name, mplus.id
+StaticPopupDialogs.LOADOUTPLANNER_OVERWRITE_BUILD.OnAccept({}, mplus)
+wow.check(mplus.code == "NEWTALENTS", "confirming replaces the build's talents with your current ones")
+wow.check(mplus.name == oldName and mplus.id == oldID, "its name and ID (so its tags) stay the same")
+
+-- Talents for another spec are never saved over a build.
+onScreen = "FERALTALENTS"
+wow.check(ns.OverwriteBuildWithCurrent(mplus) == false and mplus.code == "NEWTALENTS",
+    "talents from another spec aren't saved over a build")
+
+-- Window closed: nothing can be pending, so the game's own export is used.
+PlayerSpellsFrame.TalentsFrame.shown = false
+wow.check(ns.CurrentTalentCode() == "COMMITTEDONLY", "with the talent window closed, your applied talents are used")
+
 wow.finish()

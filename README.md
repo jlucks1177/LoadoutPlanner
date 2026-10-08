@@ -2,7 +2,7 @@
 
 A World of Warcraft addon (Retail, Midnight 12.1) for managing talent builds. It adds a panel to the talent window where you can keep an unlimited library of builds organized into groups, switch specs and builds with one click, compare any build against your current talents, browse the most-played builds for your spec per dungeon and raid boss (with links to where they come from), and tag builds to dungeons, raids, and bosses (optionally per difficulty) from anywhere, so the right one is offered when you zone in.
 
-**Version:** 0.19.0 · **Game version:** 12.1 (`## Interface: 120100`)
+**Version:** 0.20.0 · **Game version:** 12.1 (`## Interface: 120100`)
 
 This README covers what the addon does and how it works.
 
@@ -78,7 +78,7 @@ The window always tries to sit **beside** the talent window, on its right.
 | **Spec buttons** | One button per specialization. The active spec is bright; click another to switch ([section 9](#9-switching-specs)). |
 | **Top builds** | Opens the Top builds panel for your spec: most-played builds per dungeon and boss, plus a link to where each build comes from ([section 12](#12-top-builds-and-archon)). |
 | **Import** | Opens the build editor with an empty import code field. |
-| **Save current** | Opens the build editor with your current talents' import code filled in. |
+| **Save current** | Opens the build editor with your current talents' import code filled in (what the talent screen shows, pending changes included). |
 | **New group** | Creates an empty group. |
 | **"Here:" line** | Shows the dungeon or raid you're in, or "Not in a dungeon or raid". |
 | **...** | Options menu (see below). |
@@ -126,7 +126,9 @@ The list has two kinds of entries, shown in collapsible sections:
 
 ### Right-click menu
 
-For **custom builds**: Edit, Copy import code, Move up/down, tag options, and Delete (asks for confirmation).
+For **custom builds**: Edit, **Save current talents here**, Copy import code, Move up/down, tag options, and Delete (asks for confirmation).
+
+**Save current talents here** replaces the build's saved talents with what's on your talent screen right now, including changes you haven't applied yet. It asks first. The build keeps its name, icon, group and tags, so it's the quick way to update a build after tweaking it. It only works for builds of your current spec.
 
 For **Blizzard loadouts**: Save as custom build (copies it into your library), and tag options.
 
@@ -210,9 +212,19 @@ A double-click does all of this **once**: the first click's staging is cancelled
 
 ---
 
+### Blizzard's Import dialog: apply to your current loadout
+
+Blizzard's own **Import** (talent window → loadout dropdown → Import) always creates a **new** loadout. LoadoutPlanner adds a checkbox under that dialog: **Apply to my current loadout (*name*) instead**.
+
+- **Unticked** (the default): nothing changes. Blizzard's Import button makes a new loadout as usual.
+- **Ticked:** the button becomes **Apply to loadout**. The pasted code is applied the same way as double-clicking one of your custom builds: your talents change and the result saves into the Blizzard loadout you have selected. No new loadout is made, so the name field isn't needed.
+- If the code can't be used (wrong spec, outdated, not a talent code), the reason appears under the checkbox and the dialog stays open.
+- The option is disabled while the Starter Build is selected, since it can't be edited.
+- Your choice is remembered per character.
+
 ### Raidbots (SimulationCraft export)
 
-With the **SimulationCraft** addon installed, `/simc` includes **your custom builds for your current spec** alongside your Blizzard loadouts, so Raidbots offers them as talent options, the way Talent Loadout Ex did. Each appears as a `# Saved Loadout: <name>` entry. Builds with exactly the same talents as a Blizzard loadout (or your active talents) aren't listed twice, and colour codes in names are removed. SimulationCraft's checksum is recalculated so Raidbots accepts the profile. If the profile ever looks unfamiliar (for example after a SimulationCraft update), LoadoutPlanner leaves it untouched. Turn it off in the **...** menu.
+With the **SimulationCraft** addon installed, `/simc` includes **your custom builds for your current spec** alongside your Blizzard loadouts, so Raidbots offers them as talent options, the way Talent Loadout Ex did. Each appears as a `# Saved Loadout: <name>` entry. Every build is listed, even one with the same talents or name as another loadout, and colour codes in names are removed. SimulationCraft's checksum is recalculated so Raidbots accepts the profile. If the profile ever looks unfamiliar (for example after a SimulationCraft update), LoadoutPlanner leaves it untouched. Turn it off in the **...** menu.
 
 ## 7. Comparing builds
 
@@ -278,7 +290,21 @@ Builds are offered in this order, without duplicates:
 3. The instance, tagged for **any difficulty**.
 4. **Dungeons only:** the instance's tags for **every other difficulty**. Being in the dungeon is enough.
 5. **All dungeons** / **All raids** tags, with the same rules: this difficulty, then (for dungeons) Mythic+, then any difficulty. A tag on the specific place always comes before these general ones.
-6. Each **boss** of the instance (this difficulty first, then any difficulty), skipping bosses you've already killed on this difficulty.
+6. Each **boss** of the instance (this difficulty first, then any difficulty), skipping bosses you've already killed on this difficulty. (Only when boss prompts, below, are turned off. Otherwise bosses get their own prompts.)
+
+### Boss-by-boss prompts
+
+With boss tags, you're prompted as you go through the raid, not just at the door (**... → Prompt for each boss**, on by default):
+
+- **When you reach a new map area** (the sections in your map's dropdown), you're offered the build for the **next living boss in that area**.
+- **After each kill**, you're offered the next one. If an area has several bosses, they come one after another this way.
+- The prompt, **"Change talents for *boss*?"**, lists that boss's build first. Under it are **at most two** builds for the bosses after it in kill order, each marked **"Only if you're using a different kill order"**, for groups that take a different route.
+- **No build tagged on the next boss: no prompt.**
+- **Every time you re-enter an area** whose boss is still alive, you're offered its build again (but not twice within 10 seconds, so walking along an area's edge doesn't spam you).
+- No prompt if you're already wearing that boss's build, and never in combat (it waits until combat ends). A wipe doesn't prompt, since you'll pull the same boss again.
+- When you zone in, the boss prompt (if the first boss has a build) comes first and also lists the raid's own tagged builds.
+
+How "next boss" is worked out: the game tells addons which **map area** you're in, and the Adventure Guide knows which **bosses are pinned** on each area. Dead bosses come from your lockout and the kills seen this visit. Inside instances Blizzard hides your exact position, so an area is as precise as it gets; when one area has several bosses, the after-kill prompts take you through them in order. If an area has no boss pins, "next" is the next living boss in kill order. `/lp why` shows your map area, the bosses pinned there, and which boss it would offer next.
 
 **Only your current spec's builds are offered.** Tags belong to the spec you made them in, and the prompt only looks at the spec you're in. Your DPS spec's raid build is never offered while you're healing.
 
@@ -286,7 +312,7 @@ Builds are offered in this order, without duplicates:
 
 **Finding tags reliably:** a tag matches the instance if it was made under the instance's ID as the game reports it, **or** under the Encounter Journal's ID for it (they can differ), **or** if its saved place name matches the instance's name.
 
-The prompt **isn't shown** if you already have one of those builds' exact talents (chat tells you which one), if you're in combat (it asks once combat ends), or once a Mythic+ key is running. It asks once per instance and difficulty per visit. After a loading screen it waits for your talent data to load (checking every 2 seconds, up to 6 times) rather than guessing.
+The prompt **isn't shown** if you already have one of those builds' exact talents (chat tells you which one). When the place has builds of its own (tagged to that dungeon or raid, or its bosses), only those count: wearing your **All dungeons** / **All raids** build doesn't stop you being offered the dungeon's own build. It's also not shown if you're in combat (it asks once combat ends), or once a Mythic+ key is running. It asks once per instance and difficulty per visit. After a loading screen it waits for your talent data to load (checking every 2 seconds, up to 6 times) rather than guessing.
 
 **Difficulties are recognized by what they are, not only by number.** Known difficulty numbers are used directly. Anything else is classified from the game's own description of it (`GetDifficultyInfo`: raid finder, heroic, mythic, or challenge mode), so renumbered or special versions of a difficulty still match your tags.
 
@@ -436,9 +462,11 @@ Files load in this order (see `LoadoutPlanner.toc`), and each file only uses thi
 | `Builds.lua` | Account-wide build library: groups, builds, ordering, IDs, and reading import code headers. |
 | `ImportTLE.lua` | Converting Talent Loadout Ex's saved data. |
 | `Import.lua` | Parsing import codes (via Blizzard's own parser), staging builds onto the talent screen, and applying them. |
+| `ImportDialog.lua` | The "Apply to my current loadout instead" checkbox under Blizzard's talent Import dialog. |
 | `Journal.lua` | Encounter Journal data (this season's raids, bosses, and dungeons, with the map and encounter IDs used by tags; pages you can't enter left out), square boss icons, difficulty names, and icon drawing. |
 | `Context.lua` | Detecting the current instance, its bosses, and its difficulty, deciding which tagged builds to offer (`ns.GetCandidates`), when to prompt, `/lp why`, and tag commands. |
 | `Prompt.lua` | The zone-in prompt window (build choices, or spec switching when the place is tagged in another spec). |
+| `BossPrompt.lua` | Boss-by-boss prompts: on reaching a new map area and after each kill, the next living boss's build. |
 | `Diff.lua` | Build comparison (the tooltip), talent **fingerprints** (the check marks), and drawing the mini tree. |
 | `Background.lua` | Background art transparency and a reusable percent slider. |
 | `SpecBar.lua` | Reusable spec-button rows and spec switching. |
@@ -539,7 +567,7 @@ These live in `WTF/Account/<account>/SavedVariables/LoadoutPlanner.lua` and `WTF
 - **Outdated codes** can't be applied after a talent tree change, the same as in Blizzard's own importer. Re-export them from their source.
 - **"All icons" can't be searched by name,** because the game provides no names for them.
 - **Boss icons are matched heuristically.** A boss with an unusual name could get the wrong achievement's icon, or fall back to its portrait.
-- **Prompts happen when you enter (or the difficulty changes), not per pull.** Midnight restricts live encounter information, so the prompt offers your boss builds when you arrive, skipping bosses you've already killed. Between bosses, pick the next one's build from the list (it has a green strip) or with `/lp boss <#>`.
+- **Boss prompts follow map areas and kills, not your exact position.** Blizzard hides your position inside instances, so if one area holds several bosses, the next one's build is offered after each kill rather than when you walk up to it. You can always pick a build from the list (it has a green strip) or with `/lp boss <#>`.
 - **Top builds need a data addon** (LoadoutPlannerData from LoadoutPlannerSync, or ArchonTalentsData), and are only as fresh as the last sync or update. Mythic raid data fills in as the tier progresses. Raider.IO raid data comes from each top guild's *first* kill of a boss.
 - **Archon can't be read automatically** ([section 12](#12-top-builds-and-archon)). Archon builds come in by copy and paste, and the link slugs for unusual boss names are kept in `Archon.lua`, so they need updating each season.
 - **The tag panel lists the current season's raids and dungeons** (from the Encounter Journal). Older instances can be tagged from inside them, under **Here:**.

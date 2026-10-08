@@ -66,6 +66,17 @@ for _, o in ipairs(wow.created) do
 end
 wow.check(lit >= 1, "the chosen Top builds tab shows as selected")
 
+-- The zone-in / boss prompt opens with its measured layout code running
+-- (the fake game can't check sizes; the layout itself is checked in game).
+local entries = {
+    { item = { name = "Sszorak Keepers" }, note = "Next boss: Sszorak" },
+    { item = { name = "Twin Fangs" }, note = "Only if you're using a different kill order (boss 6)" },
+}
+ok, err = pcall(ns.ShowZonePrompt, { name = "Raid", difficulty = 15 }, entries, "Change talents for Sszorak?")
+wow.check(ok, "the prompt opens" .. (ok and "" or (": " .. tostring(err))))
+local promptFrame = _G.LoadoutPlannerPrompt
+wow.check(promptFrame and promptFrame.shown and promptFrame.title.text == "Change talents for Sszorak?",
+    "the boss prompt shows with the boss in its title")
 if mode == "missing" then
     wow.check((wow.templates.BackdropTemplate or 0) > 1, "falls back to plain frames when templates are gone")
 end

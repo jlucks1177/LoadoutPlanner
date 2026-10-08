@@ -48,6 +48,9 @@ local function newObj(name)
             if k == "Hide" then self.shown = false return end
             if k == "IsShown" then return self.shown end
             if k == "SetShown" then self.shown = (...) and true or false return end
+            if k == "SetChecked" then self.checked = (...) and true or false return end
+            if k == "GetChecked" then return self.checked or false end
+            if k == "SetEnabled" then self.enabled = (...) and true or false return end
             if k == "SetScript" then
                 local event, fn = ...
                 self.scripts = self.scripts or {}

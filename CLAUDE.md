@@ -35,9 +35,11 @@ Lua 5.1 (WoW's version). Each file starts with `local addonName, ns = ...`, and 
 | `Builds.lua` | Custom build library: groups, import codes. |
 | `ImportTLE.lua` | Import from the Talent Loadout Ex addon. |
 | `Import.lua` | Import code → talents: stage (click) / apply (double-click) into the selected loadout. |
+| `ImportDialog.lua` | Checkbox strip under Blizzard's `ClassTalentLoadoutImportDialog`: ticked, our button covers Blizzard's Import button and applies the code via `ns.ApplyBuild` (no Blizzard function is replaced). Adds nothing if the dialog isn't shaped as expected. |
 | `Journal.lua` | Encounter Journal: season raids, dungeons, bosses, icons, difficulty. |
 | `Context.lua` | Where you are → which tagged builds apply. |
 | `Prompt.lua` | The zone-in "Change talents for …?" prompt. |
+| `BossPrompt.lua` | Boss-by-boss prompts: new map area (`C_Map.GetBestMapForUnit` + `C_EncounterJournal.GetEncountersOnMap`) and after each kill (`ENCOUNTER_END`), offering the next living boss's build, then later bosses'. Next boss untagged = no prompt. CheckContext calls `ns.TryBossPrompt` first and leaves boss tags out of the zone-in prompt while this is on. |
 | `Diff.lua` | Hover comparison tooltip (talent map). |
 | `Background.lua` | Talent-art transparency, slider widget. |
 | `SpecBar.lua` | Spec switch buttons. |
@@ -68,6 +70,8 @@ cd tools/sync && npm test       # the sync tool
 - `tools/test/wow.lua` is a fake WoW API. Frames answer any method call. Add stubs there when the addon starts using a new API.
 - `test_load.lua` loads every TOC file in three modes: `modern`, `fallback` (no atlases), `missing` (templates gone).
 - `test_topbuilds.lua` drives the Top builds panel with `fixtures/Builtin.lua` (fake parses.gg data).
+- `test_bossprompt.lua` plays a fake four-boss raid over two map areas: zone-in, wipe, kills, an untagged boss, combat, already wearing, skipping ahead, at most two extras, re-offer on re-entry (10 s gap), option off.
+- `test_importdialog.lua` checks the Import-dialog checkbox with a fake Blizzard dialog (off by default, applies via `ns.ApplyBuild`, stays open on errors, disabled on the Starter Build).
 - `test_simc.lua` checks the SimulationCraft export (pairs added, every build listed even duplicates, checksum valid, other specs skipped, option off).
 - `test_tags.lua` uses a fake Encounter Journal to check boss lists, left-out journal pages, the Keystone Dungeons migration, which builds the zone-in prompt offers, ring colours, and loadout/build separation.
 - **Add a test for every bug fix** that fails without the fix. Check that it does fail, since a test that can't fail proves nothing.

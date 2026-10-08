@@ -156,6 +156,53 @@ function ns.SaveBuild(fields, groupName, existing)
     ns.Notify()
 end
 
+------------------------------------------------------------------------
+-- Your current talents, as an import code
+------------------------------------------------------------------------
+-- What the talent screen shows RIGHT NOW, pending (not yet applied)
+-- changes included: if you've been clicking talents around, that's what
+-- you mean by "current". The talent window's own export (the one behind
+-- Blizzard's Share button) includes pending changes; it only reads, so
+-- calling it is safe. With the window closed there's nothing pending, and
+-- the game's export of your active talents is the same thing.
+function ns.CurrentTalentCode()
+    local frame = PlayerSpellsFrame and PlayerSpellsFrame.TalentsFrame
+    if type(frame) == "table" and type(frame.GetLoadoutExportString) == "function"
+        and frame.IsShown and frame:IsShown() then
+        local ok, code = pcall(frame.GetLoadoutExportString, frame)
+        if ok and type(code) == "string" and code ~= "" then return code end
+    end
+    local ok, code = pcall(C_Traits.GenerateImportString, C_ClassTalents.GetActiveConfigID())
+    if ok and type(code) == "string" and code ~= "" then return code end
+    return nil
+end
+
+-- Overwrite a saved build's talents with your current ones. Its name,
+-- icon, group and tags stay (tags point at the build's ID, not its code).
+-- Returns true if the build changed; otherwise prints why not.
+function ns.OverwriteBuildWithCurrent(build)
+    local code = ns.CurrentTalentCode()
+    local specID, problem = ns.ReadCodeHeader(code)
+    if not specID then
+        ns.Print("Couldn't read your current talents (" .. tostring(problem) .. ").")
+        return false
+    end
+    if specID ~= build.specID then
+        ns.Print(("|cffffd100%s|r is a build for another spec. Switch to that spec to save over it.")
+            :format(build.name))
+        return false
+    end
+    if code == build.code then
+        ns.Print(("|cffffd100%s|r already has these talents."):format(build.name))
+        return false
+    end
+    ns.ForgetParsedBuild(build.code)
+    build.code = code
+    ns.Print(("Saved your current talents to |cffffd100%s|r."):format(build.name))
+    ns.Notify()
+    return true
+end
+
 function ns.DeleteBuild(build)
     local _, group, index = ns.GetBuildByID(build.id)
     if group then

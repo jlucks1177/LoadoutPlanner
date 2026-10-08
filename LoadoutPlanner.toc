@@ -15,9 +15,11 @@ Data.lua
 Builds.lua
 ImportTLE.lua
 Import.lua
+ImportDialog.lua
 Journal.lua
 Context.lua
 Prompt.lua
+BossPrompt.lua
 Diff.lua
 Background.lua
 SpecBar.lua

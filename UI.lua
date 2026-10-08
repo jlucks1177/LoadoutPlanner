@@ -79,6 +79,16 @@ StaticPopupDialogs.LOADOUTPLANNER_DELETE_BUILD = basePopup({
     end,
 })
 
+-- Overwriting is the one change you can't undo, so it asks first.
+StaticPopupDialogs.LOADOUTPLANNER_OVERWRITE_BUILD = basePopup({
+    text = "Replace the talents saved in |cffffd100%s|r with the talents on your talent screen now?\n\n"
+        .. "Its name, icon, group and tags stay the same.",
+    button1 = YES, button2 = CANCEL,
+    OnAccept = function(dialog, data)
+        ns.OverwriteBuildWithCurrent(data or dialog.data)
+    end,
+})
+
 StaticPopupDialogs.LOADOUTPLANNER_COPY = basePopup({
     text = "Import code for |cffffd100%s|r\n(Ctrl+C to copy)",
     button1 = CLOSE, button2 = nil,
@@ -115,6 +125,10 @@ local function openItemMenu(owner, item)
         root:CreateTitle(item.name)
         if item.build then
             root:CreateButton("Edit...", function() ns.OpenEditor({ build = item.build }) end)
+            -- Tweaked your talents? Save them back into this build.
+            root:CreateButton("Save current talents here", function()
+                StaticPopup_Show("LOADOUTPLANNER_OVERWRITE_BUILD", item.name, nil, item.build)
+            end)
             root:CreateButton("Copy import code", function()
                 StaticPopup_Show("LOADOUTPLANNER_COPY", item.name, nil, item.build)
             end)
