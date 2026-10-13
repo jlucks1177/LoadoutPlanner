@@ -136,6 +136,42 @@ shown = nil
 mapID = 50; fire("ZONE_CHANGED_INDOORS")
 wow.check(shown and shown.title == "Change talents for Alpha?", "re-entering an area later: its living boss is offered again")
 
+-- 9b. Your friend's case: "Any" tags, wearing boss 1's build, and the kill
+-- event's ID doesn't match the Adventure Guide's. Before v0.20.1 the boss
+-- just killed still counted as "next", you were wearing its build, so:
+-- silence. Now the kill is also matched by the boss's NAME.
+ns.ResetBossPrompts()
+local anyTags = {}
+for k, v in pairs(spec.bosses) do anyTags[k] = v end
+spec.bosses = {
+    [301] = { buildID = builds["Alpha build"].id, name = "Alpha build" }, -- Any difficulty
+    [302] = { buildID = builds["Bravo build"].id, name = "Bravo build" },
+}
+mapID, wearing, shown = 50, builds["Alpha build"], nil
+fire("ENCOUNTER_END", 99999, "Alpha", 15, 20, 1) -- an ID the journal doesn't know
+wow.check(shown and shown.title == "Change talents for Bravo?",
+    "Any tags: after a kill whose ID doesn't match, the next boss is still offered (matched by name)")
+
+-- And when even the name isn't usable, the second check (once the lockout
+-- has caught up) still finds the next boss.
+ns.ResetBossPrompts()
+local queued = {}
+C_Timer.After = function(_, fn) table.insert(queued, fn) end
+local lockoutDone = false
+ns.IsBossKilled = function(id) return lockoutDone and id == 301 end
+wearing, shown = builds["Alpha build"], nil
+fire("ENCOUNTER_END", nil, nil, 15, 20, 1)
+queued[1]() -- 2 seconds later: lockout not updated yet
+wow.check(shown == nil, "(lockout not caught up yet: nothing offered yet)")
+lockoutDone = true
+if queued[2] then queued[2]() end -- 8 seconds later
+wow.check(shown and shown.title == "Change talents for Bravo?",
+    "a second check a few seconds later catches the kill once the lockout updates")
+C_Timer.After = function(_, fn) fn() end
+ns.IsBossKilled = function() return false end
+spec.bosses = anyTags
+wearing = nil
+
 -- 10. Turned off in the ... menu: nothing.
 ns.ResetBossPrompts()
 ns.db.bossPrompts = false

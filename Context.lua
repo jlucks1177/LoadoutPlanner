@@ -32,19 +32,58 @@ function ns.GetCurrentInstance()
     end
 end
 
--- Bosses of the current instance, read from the Encounter Journal.
+-- Bosses of the current instance, in kill order.
 -- Returns a list of { id = journalEncounterID, name = "..." }.
+--
+-- BUG FIX (v0.20.1): this used to ask the Encounter Journal directly, but
+-- the journal only lists a raid's bosses once that raid is SELECTED in it
+-- (the same thing that hid boss icons before v0.19). Unselected, the list
+-- came back empty, and boss prompts said "no boss left". Now:
+--   1. use this season's list from Journal.lua (read with the raid
+--      selected; the same list the tag panel, and so your tags, come from);
+--   2. otherwise ask the journal, selecting the instance first (unless the
+--      Adventure Guide is open, so we never change what it's showing).
 function ns.GetCurrentBosses()
-    if not ns.GetCurrentInstance() then
+    local instance = ns.GetCurrentInstance()
+    if not instance then
         return {}
     end
+    local wantedName = instance.name and instance.name:lower()
 
-    -- The Encounter Journal uses its own instance IDs, so we translate
-    -- from the map the player is standing on.
-    local mapID = C_Map.GetBestMapForUnit("player")
-    local journalInstanceID = mapID and EJ_GetInstanceForMap(mapID)
+    -- 1. This season's raids and dungeons.
+    local journalInstanceID
+    local ok, season = pcall(ns.GetSeason)
+    if ok and type(season) == "table" then
+        for _, list in ipairs({ season.raids or {}, season.dungeons or {} }) do
+            for _, entry in ipairs(list) do
+                local sameMap = entry.mapID and instance.ids[entry.mapID]
+                local sameName = entry.name and entry.name:lower() == wantedName
+                if sameMap or sameName then
+                    if entry.bosses and #entry.bosses > 0 then
+                        local bosses = {}
+                        for i, boss in ipairs(entry.bosses) do
+                            bosses[i] = { id = boss.encounterID, name = boss.name }
+                        end
+                        return bosses
+                    end
+                    journalInstanceID = entry.journalID -- dungeons: bosses aren't stored, read below
+                end
+            end
+        end
+    end
+
+    -- 2. The journal itself. It uses its own instance IDs, so translate
+    -- from the map you're standing on if the season list didn't say.
+    if not journalInstanceID then
+        local mapID = C_Map.GetBestMapForUnit("player")
+        journalInstanceID = mapID and EJ_GetInstanceForMap and EJ_GetInstanceForMap(mapID)
+    end
     if not journalInstanceID or journalInstanceID == 0 then
         return {}
+    end
+    local guideOpen = EncounterJournal and EncounterJournal.IsShown and EncounterJournal:IsShown()
+    if EJ_SelectInstance and not guideOpen then
+        pcall(EJ_SelectInstance, journalInstanceID)
     end
 
     local bosses = {}

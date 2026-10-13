@@ -28,6 +28,8 @@ local MAX_EXTRA = 2         -- later bosses listed under the next one, at most
 local REPEAT_GAP = 10
 local lastOffered = {}     -- "journalEncounterID@difficulty" -> time it was last offered
 local killedThisVisit = {} -- dungeonEncounterID -> true
+local killedNames = {}     -- normalized boss name -> true (kills seen this visit)
+local lastKill             -- { name, id, matched } for /lp why
 local lastMapID
 local pending              -- a trigger that arrived in combat: run it afterwards
 
@@ -36,7 +38,7 @@ local function enabled()
 end
 
 function ns.ResetBossPrompts()
-    lastOffered, killedThisVisit, lastMapID, pending = {}, {}, nil, nil
+    lastOffered, killedThisVisit, killedNames, lastMapID, pending, lastKill = {}, {}, {}, nil, nil, nil
 end
 
 -- The game's encounter ID for a journal boss (what ENCOUNTER_END reports).
@@ -46,9 +48,19 @@ local function dungeonEncounterID(journalID)
     return ok and id or nil
 end
 
+-- "Nek'zali the Soulcoiler" and "Nekzali the soulcoiler" compare equal.
+local function norm(name)
+    return (tostring(name or ""):lower():gsub("[^%w]", ""))
+end
+
+-- Dead = killed this visit (by the kill event's ID OR its boss name), or
+-- on your lockout. The name matters: if the kill event's ID doesn't match
+-- the Adventure Guide's, the boss you just killed would otherwise still
+-- count as "next", and since you're wearing its build: silence (v0.20.0).
 local function isDead(boss, instance)
     local dungeonID = dungeonEncounterID(boss.id)
     if dungeonID and killedThisVisit[dungeonID] then return true end
+    if killedNames[norm(boss.name)] then return true end
     return ns.IsBossKilled and ns.IsBossKilled(boss.id, instance.rawDifficulty) or false
 end
 
@@ -197,11 +209,28 @@ ns.On("ZONE_CHANGED_INDOORS", mapChanged)
 ns.NoteBossMap = function() lastMapID = currentMapID() end -- zone-in: remember where we started
 
 -- A boss fight ended. success = 1 on a kill; a wipe changes nothing.
-ns.On("ENCOUNTER_END", function(encounterID, _, _, _, success)
-    if success ~= 1 then return end
-    if encounterID then killedThisVisit[encounterID] = true end
-    -- Give the game a moment (loot, the lockout updating, leaving combat).
+-- Everything here is wrapped in pcall: if the game ever hands us values we
+-- can't use (an unexpected ID, a restricted value), we still check.
+ns.On("ENCOUNTER_END", function(encounterID, encounterName, _, _, success)
+    local okKill, isKill = pcall(function() return success == 1 end)
+    if okKill and not isKill then return end -- a wipe
+    pcall(function()
+        if type(encounterID) == "number" then killedThisVisit[encounterID] = true end
+        if type(encounterName) == "string" and encounterName ~= "" then killedNames[norm(encounterName)] = true end
+        lastKill = { name = encounterName, id = encounterID }
+        -- Did it match one of this instance's bosses? (For /lp why.)
+        local instance = ns.GetCurrentInstance()
+        local ok, bosses = pcall(ns.GetCurrentBosses)
+        for _, boss in ipairs(ok and bosses or {}) do
+            if instance and isDead(boss, instance) and norm(boss.name) == norm(encounterName) then
+                lastKill.matched = boss.name
+            end
+        end
+    end)
+    -- Give the game a moment (loot, leaving combat), then check; and again
+    -- a bit later, in case the lockout was still catching up the first time.
     C_Timer.After(2, trigger)
+    C_Timer.After(8, trigger)
 end)
 
 ns.On("PLAYER_REGEN_ENABLED", function()
@@ -225,9 +254,23 @@ function ns.PrintBossStatus(instance)
     end
     print(("  Map area: %s | bosses pinned here: %s"):format(tostring(mapID),
         #names > 0 and table.concat(names, ", ") or "none"))
+    if lastKill then
+        print(("  Last kill seen: %s (id %s)%s"):format(tostring(lastKill.name), tostring(lastKill.id),
+            lastKill.matched and (" -> counted as dead: " .. lastKill.matched)
+            or " |cffff8040-> not matched to a boss here|r"))
+    end
+    -- How many bosses were found, and how many count as dead: tells "the
+    -- boss list came back empty" apart from "everything's dead".
+    local dead = 0
+    for _, boss in ipairs(ok and bosses or {}) do
+        if isDead(boss, instance) then dead = dead + 1 end
+    end
+    local found = ok and bosses and #bosses or 0
+    print(("  Bosses found: %d (%d dead)%s"):format(found, dead,
+        found == 0 and " |cffff8040- the boss list came back empty|r" or ""))
     local offer = ns.GetBossOffer(instance)
     if not offer then
-        print("  Next boss: none left (or none found)")
+        print(found == 0 and "  Next boss: none (no boss list)" or "  Next boss: none (all dead)")
     elseif not offer.next.candidate then
         print(("  Next boss: %s (no build tagged, so no prompt)"):format(offer.next.boss.name))
     else

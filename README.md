@@ -2,7 +2,7 @@
 
 A World of Warcraft addon (Retail, Midnight 12.1) for managing talent builds. It adds a panel to the talent window where you can keep an unlimited library of builds organized into groups, switch specs and builds with one click, compare any build against your current talents, browse the most-played builds for your spec per dungeon and raid boss (with links to where they come from), and tag builds to dungeons, raids, and bosses (optionally per difficulty) from anywhere, so the right one is offered when you zone in.
 
-**Version:** 0.20.0 · **Game version:** 12.1 (`## Interface: 120100`)
+**Version:** 0.20.1 · **Game version:** 12.1 (`## Interface: 120100`)
 
 This README covers what the addon does and how it works.
 

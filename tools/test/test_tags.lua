@@ -78,6 +78,25 @@ wow.check(#season.dungeons == 1 and season.dungeons[1].name == "Murder Row",
     "the \"Keystone Dungeons\" page isn't listed as a dungeon")
 wow.check(#season.skipped == 2, "both pages are reported as left out")
 
+-- Inside the raid, its boss list comes back even when the Adventure Guide
+-- has some OTHER instance selected (the v0.20.0 boss-prompt bug: the list
+-- was empty, so the boss prompts said "no boss left").
+GetInstanceInfo = function() return "The Venomous Abyss", "raid", 15, "", 20, 0, false, 3100 end
+selected = 11
+local here = ns.GetCurrentBosses()
+wow.check(#here == 2 and here[1].name == "Nymrissa Wavecaller" and here[2].name == "Sszorak",
+    "inside a raid, its bosses are found even if the journal had another instance selected")
+-- And from the journal directly (no season data), it selects the raid first.
+local realSeason = ns.GetSeason
+ns.GetSeason = function() return { raids = {}, dungeons = {} } end
+C_Map.GetBestMapForUnit = function() return 777 end
+EJ_GetInstanceForMap = function() return 2 end
+selected = 11
+here = ns.GetCurrentBosses()
+wow.check(#here == 2, "reading the journal directly selects the raid first")
+ns.GetSeason, C_Map.GetBestMapForUnit, EJ_GetInstanceForMap = realSeason, function() end, nil
+GetInstanceInfo = function() return "Silvermoon", "none" end
+
 ------------------------------------------------------------------------
 -- 2. Old tags on "Keystone Dungeons" move to "All dungeons"
 ------------------------------------------------------------------------
