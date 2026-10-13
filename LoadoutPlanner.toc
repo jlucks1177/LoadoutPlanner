@@ -1,4 +1,4 @@
-## Interface: 120100
+## Interface: 120105, 120100
 ## Title: LoadoutPlanner
 ## Notes: Tag talent loadouts to dungeons and raid bosses, and get offered the right build at the right time.
 ## Version: @project-version@

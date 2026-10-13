@@ -43,9 +43,20 @@ end
 -- describe the difficulty (GetDifficultyInfo) and classify it, so a new
 -- or renumbered difficulty (or a special version of one) still maps to
 -- LFR / Normal / Heroic / Mythic / Mythic+.
+-- Other difficulty IDs the game uses (DifficultyUtil.ID), mapped to ours
+-- explicitly instead of guessing from GetDifficultyInfo:
+local DIFFICULTY_ALIASES = {
+    [233] = 16, -- RaidMythicFlexible: Mythic run with a flexible group (Kith'ix, 12.1.5)
+    [220] = 17, -- RaidStory: Story Mode, the easiest way to run a raid; closest is LFR
+    [7] = 17,   -- RaidLFR (legacy ID)
+    [33] = 14,  -- RaidTimewalker
+    [24] = 1,   -- DungeonTimewalker
+}
+
 function ns.NormalizeDifficulty(difficultyID, instanceType)
     if not difficultyID or difficultyID == 0 then return nil end
     if ns.DIFFICULTY_BY_ID[difficultyID] then return difficultyID end
+    if DIFFICULTY_ALIASES[difficultyID] then return DIFFICULTY_ALIASES[difficultyID] end
     if not GetDifficultyInfo then return nil end
     -- name, groupType, isHeroic, isChallengeMode, displayHeroic,
     -- displayMythic, toggleDifficultyID, isLFR, ...

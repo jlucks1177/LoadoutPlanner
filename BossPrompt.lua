@@ -272,7 +272,21 @@ function ns.PrintBossStatus(instance)
     if not offer then
         print(found == 0 and "  Next boss: none (no boss list)" or "  Next boss: none (all dead)")
     elseif not offer.next.candidate then
-        print(("  Next boss: %s (no build tagged, so no prompt)"):format(offer.next.boss.name))
+        -- Say WHY: which tags this boss does have (other difficulties?),
+        -- so "no build tagged" isn't a mystery.
+        local difficulty = ns.DIFFICULTY_BY_ID[instance.difficulty]
+        print(("  Next boss: %s (no build tagged for %s or Any in this spec, so no prompt)")
+            :format(offer.next.boss.name, difficulty and difficulty.name or "this difficulty"))
+        local others = {}
+        local spec = ns.GetSpecData()
+        for key, ref in pairs(spec and spec.bosses or {}) do
+            local id, diff = tostring(key):match("^(%d+)@?(%d*)$")
+            if tonumber(id) == offer.next.boss.id then
+                local d = tonumber(diff) and ns.DIFFICULTY_BY_ID[tonumber(diff)]
+                table.insert(others, ("%s on %s"):format(tostring(ref.name), d and d.name or "Any"))
+            end
+        end
+        print("    Its tags in this spec: " .. (#others > 0 and table.concat(others, ", ") or "none"))
     else
         local key = ns.TagKey(offer.next.boss.id, instance.difficulty)
         print(("  Next boss: %s -> %s%s"):format(offer.next.boss.name, offer.next.candidate.item.name,

@@ -97,6 +97,14 @@ wow.check(#here == 2, "reading the journal directly selects the raid first")
 ns.GetSeason, C_Map.GetBestMapForUnit, EJ_GetInstanceForMap = realSeason, function() end, nil
 GetInstanceInfo = function() return "Silvermoon", "none" end
 
+-- Difficulty IDs beyond the usual ones (12.1.5's Kith'ix raid has a
+-- flexible Mythic and a Story Mode): mapped explicitly, not guessed.
+GetDifficultyInfo = nil -- no help from the game: the mapping alone must do it
+wow.check(ns.NormalizeDifficulty(233, "raid") == 16, "flexible Mythic (233) counts as Mythic: M tags apply")
+wow.check(ns.NormalizeDifficulty(220, "raid") == 17, "Story Mode (220) counts as LFR")
+wow.check(ns.NormalizeDifficulty(15, "raid") == 15 and ns.NormalizeDifficulty(8, "party") == 8,
+    "the usual difficulties are unchanged")
+
 ------------------------------------------------------------------------
 -- 2. Old tags on "Keystone Dungeons" move to "All dungeons"
 ------------------------------------------------------------------------

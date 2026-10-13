@@ -1,6 +1,6 @@
 # LoadoutPlanner: notes for Claude
 
-A World of Warcraft addon for **Midnight (12.1, `## Interface: 120100`)**. It docks a panel beside the talent window that manages talent loadouts. You can tag builds to raids, bosses, dungeons and difficulties, it prompts you to switch builds when you zone in, and it shows the most-played builds for your spec ("Top builds"). Published on GitHub (`jlucks1177/LoadoutPlanner`) and CurseForge (project 1713714).
+A World of Warcraft addon for **Midnight (12.1.5, `## Interface: 120105, 120100`)**. It docks a panel beside the talent window that manages talent loadouts. You can tag builds to raids, bosses, dungeons and difficulties, it prompts you to switch builds when you zone in, and it shows the most-played builds for your spec ("Top builds"). Published on GitHub (`jlucks1177/LoadoutPlanner`) and CurseForge (project 1713714).
 
 ## How the maintainer works: read this first
 
@@ -95,7 +95,10 @@ The maintainer runs these from the repo root (PowerShell on Windows):
 
 1. `git pull` first, always. The daily job commits new builds, so local copies fall behind.
 2. Make the change, run the tests, and check it in game. The `AddOns\LoadoutPlanner` folder may be a junction to this folder, so `/reload` picks up edits.
-3. Bump `VERSION` (patch for fixes, minor for features) and add a section for it at the top of `CHANGELOG.md` (the packager uses it as the CurseForge release notes; see `.pkgmeta`).
+3. Bump `VERSION` (patch for fixes, minor for features). Changelogs come in two files:
+   - `CHANGELOG.md` holds **only the version being released**. The packager uses it as the CurseForge release notes (see `.pkgmeta`), so players see just what's new.
+   - `CHANGELOG_HISTORY.md` holds every earlier version, newest first.
+   When starting a new version, move the whole current section from `CHANGELOG.md` to the top of `CHANGELOG_HISTORY.md` (under its intro), then write the new version's notes in `CHANGELOG.md`.
 4. `git add -A`, `git commit -m "…"`, `git push`.
 5. `git tag -a vX.Y.Z -m "vX.Y.Z"`, `git push origin vX.Y.Z`. The Release workflow tests, packages, and uploads to GitHub and CurseForge. **Only a tag publishes** (unless `AUTO_RELEASE` is turned on).
 
