@@ -1,11 +1,11 @@
 -- Generated daily by LoadoutPlannerSync (GitHub Actions). Do not edit by hand.
 -- Sources: parses.gg (free to reuse) and, when enabled, the Raider.IO API.
--- content-hash: ddae528411cf310a2e10ffbf7149b9cd30f2bfd1
+-- content-hash: 38bc1a552c443022eb2e224078894a7c51e0f4b2
 LoadoutPlannerBuiltin = {
 	parses = {
 		source = "parses.gg",
 		cohort = "top10",
-		generated = "2026-10-18T14:38:45.673Z",
+		generated = "2026-10-19T17:31:16.748Z",
 		season = {
 			slug = "season-mn-2",
 			name = "MN Season 2",
@@ -514,9 +514,9 @@ LoadoutPlannerBuiltin = {
 					cohort = "top10",
 					builds = {
 						{
-							code = "CIEAAAAAAAAAAAAAAAAAAAAAAsZeAzyYGzYmZWWGjZZWmlZMAADAAAAAAaamhZMzwY2aDADMgZw2AAAzMtNzsMDAwmlFMAgZYMAALzAmZGwYB",
-							count = 1,
-							share = 0.1,
+							code = "CIEAAAAAAAAAAAAAAAAAAAAAAsZeAzyYGzYmZWWGjZZWmlZMAADAAAAAAaamhZYGGzWbAYgBMD2GAAYmptZmlZAA2ssgBAjZYMAALzAmZGwYB",
+							count = 2,
+							share = 0.2,
 						},
 					},
 				},
@@ -859,8 +859,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjxMzmZmZmZmZMzMzMzMzDsMjxMjZzMzMAAQMW2GYBMgZYCMDbAzMMAAAzMMmlhxgxA",
-							count = 6,
-							share = 0.375,
+							count = 5,
+							share = 0.313,
 						},
 					},
 				},
@@ -893,13 +893,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Kings' Rest",
 					isAll = false,
-					samples = 13,
+					samples = 14,
 					cohort = "all",
 					builds = {
 						{
 							code = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjxMzmZmZmZmZMzMzMzMzDsMjxMjZzMzMAAQMW2GYBMgZYCMDbAzMMAAAzMMmlhxgxA",
 							count = 5,
-							share = 0.385,
+							share = 0.357,
 						},
 					},
 				},
@@ -973,26 +973,26 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "All dungeons",
 					isAll = true,
-					samples = 28,
+					samples = 29,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CkEAAAAAAAAAAAAAAAAAAAAAA0yAAAjZYmZmZGzmZmlZMGjGzMDLGzMjZYmBAAAALzMAzYAGYDWWMaMDgZBzshZmZmhxCAMzAAwMwDYA",
 							count = 5,
-							share = 0.179,
+							share = 0.172,
 						},
 					},
 				},
 				{
 					target = "Altar of Fangs",
 					isAll = false,
-					samples = 32,
-					cohort = "all",
+					samples = 5,
+					cohort = "top10",
 					builds = {
 						{
-							code = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzYmZmZmxsZmZZGjxoxMGWMzMzYGmZAAAAwyMDwMGgB2glFjGzAYWwMbAzMDmNAYmBAgZgxA",
-							count = 4,
-							share = 0.125,
+							code = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzYmZmZmxsZmZZGjxoxMmxyMzMzwwMDAAAAWmZAmxAMwGssY0YGAzCmZDYMDzsAAzMAAYgxA",
+							count = 1,
+							share = 0.2,
 						},
 					},
 				},
@@ -1216,8 +1216,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZMzGzMzMGzmx2MLzMzMmZAAAAYJY2MGmZUzYWGzMzsMmxMAAAAAAGYAAAA0MLzyMzMAgFwMDwCDGAAAzshB",
-							count = 25,
-							share = 0.735,
+							count = 24,
+							share = 0.706,
 						},
 					},
 				},
@@ -1250,13 +1250,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Kings' Rest",
 					isAll = false,
-					samples = 29,
+					samples = 30,
 					cohort = "all",
 					builds = {
 						{
 							code = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmZ2MzMzMGzmx2YbGzMmZAAAAYJY2M8AmZUzYWGzMzsMmxMAAAAAAGYAAAA0MLzyMzMAgFwMDwCDGAAAzshB",
 							count = 12,
-							share = 0.414,
+							share = 0.4,
 						},
 					},
 				},
@@ -1330,13 +1330,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "All dungeons",
 					isAll = true,
-					samples = 39,
+					samples = 40,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CgGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmxsYmZMzyMLmxMLLDMbGGNRzMzyMzMzsMmBAAAAAAjNDYZbmBjZZAMBAAAshZGgFjhBsYBgZGAD",
 							count = 9,
-							share = 0.231,
+							share = 0.225,
 						},
 					},
 				},
@@ -1382,13 +1382,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Murder Row",
 					isAll = false,
-					samples = 5,
+					samples = 6,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CgGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMjZWMLmxMLLDMbGGNRmZWmZmZmlxMAAAAAAMjtZALbzMYMLDgJAAAgNMzAsYmhBmNLbAmZAA",
 							count = 1,
-							share = 0.2,
+							share = 0.167,
 						},
 					},
 				},
@@ -1573,8 +1573,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMGMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
-							count = 12,
-							share = 0.152,
+							count = 11,
+							share = 0.139,
 						},
 					},
 				},
@@ -1612,8 +1612,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMGMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
-							count = 3,
-							share = 0.333,
+							count = 2,
+							share = 0.222,
 						},
 					},
 				},
@@ -1806,26 +1806,26 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "All dungeons",
 					isAll = true,
-					samples = 28,
+					samples = 30,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMGDz2MzMTz2MzYMjBAAAAAAAgZGDDAWmxMzmZGzMjBGYGbassBYbwGGwMAMmZGzgZGMmxA",
 							count = 4,
-							share = 0.143,
+							share = 0.133,
 						},
 					},
 				},
 				{
 					target = "Altar of Fangs",
 					isAll = false,
-					samples = 5,
+					samples = 6,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZmZGDz2MzMTzmZGzMDAAAAAAAAMzYYAwyMmZ2MzYmZAbmNDDMwsxQjFMgZAYMzMmBYmZYMA",
 							count = 1,
-							share = 0.2,
+							share = 0.167,
 						},
 					},
 				},
@@ -1910,13 +1910,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Voidscar Arena",
 					isAll = false,
-					samples = 37,
-					cohort = "all",
+					samples = 5,
+					cohort = "top10",
 					builds = {
 						{
-							code = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMmZYWmZmZa2MzYmZMAAAAAAAAMPwYYAwyMY2MzYmZMwAzYTjlFAbD2wAmBwMzMzYGMzghxA",
-							count = 6,
-							share = 0.162,
+							code = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmZMjZMY2GzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
+							count = 1,
+							share = 0.2,
 						},
 					},
 				},
@@ -1925,26 +1925,26 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "All dungeons",
 					isAll = true,
-					samples = 53,
+					samples = 54,
 					cohort = "top10",
 					builds = {
 						{
 							code = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzMzs8AzYmZmZMzgZGzMMzYmZGbzMjZMDLjpZAAAAAAAAgHYMGwMbAYWAbDAA",
 							count = 7,
-							share = 0.132,
+							share = 0.13,
 						},
 					},
 				},
 				{
 					target = "Altar of Fangs",
 					isAll = false,
-					samples = 6,
+					samples = 7,
 					cohort = "top10",
 					builds = {
 						{
 							code = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzMzs8AzYmZmZMzgZGzMMzYmZGbzMDjZYZMNDAAAAAAAA8AjxAmZDgZWAbDAA",
 							count = 1,
-							share = 0.167,
+							share = 0.143,
 						},
 					},
 				},
@@ -2057,13 +2057,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Altar of Fangs",
 					isAll = false,
-					samples = 15,
+					samples = 16,
 					cohort = "all",
 					builds = {
 						{
 							code = "C4PAAAAAAAAAAAAAAAAAAAAAAwGMwMGNWGAzgNAAAAAAAAwMmZmx2MmZGzwyYaGDmltlZmZmZmZmZhZWGmBAAwDMGDAzYDMAbMz2MG",
 							count = 4,
-							share = 0.267,
+							share = 0.25,
 						},
 					},
 				},
@@ -2122,13 +2122,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Temple of Sethraliss",
 					isAll = false,
-					samples = 28,
+					samples = 29,
 					cohort = "all",
 					builds = {
 						{
 							code = "C4PAAAAAAAAAAAAAAAAAAAAAAwGMwMGNWGAzgNAAAAAAAAwMmZmx2MmZGzwyYaGDmltlZmZmZmZmZhZWGmBAAwDMGDAzYDMAbMz2MG",
 							count = 5,
-							share = 0.179,
+							share = 0.172,
 						},
 					},
 				},
@@ -2148,13 +2148,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Voidscar Arena",
 					isAll = false,
-					samples = 17,
+					samples = 19,
 					cohort = "all",
 					builds = {
 						{
-							code = "C4PAAAAAAAAAAAAAAAAAAAAAAwGMwMGNWGAzgNAAAAAAAAwMmZmx2MmZGzwyYaGDmltlZmZmZmZmZhZWGmBAAwDMGDAzYDMAbMz2MG",
+							code = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMmxMLbzYmZMDeATzYwYbZmZmZmZmZWYmlBDAAwYmxMDwM2YYA2YmtZMA",
 							count = 3,
-							share = 0.176,
+							share = 0.158,
 						},
 					},
 				},
@@ -2406,8 +2406,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMzMmlxMjZGDzALzMzMAAAAGzsMzYmZmhhZGAzUAMzCGCjZbAGDsYmZAwMmZMGMDwMzMwA",
-							count = 11,
-							share = 0.244,
+							count = 10,
+							share = 0.222,
 						},
 					},
 				},
@@ -2444,7 +2444,7 @@ LoadoutPlannerBuiltin = {
 					cohort = "top10",
 					builds = {
 						{
-							code = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMzMmlxMjZGDzALzMzMAAAAGzsMzYmZmhhZGAzUAMzCGCjZbAGDsYmZAwMmZMGMDwMzMwA",
+							code = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMzMmlxMjZGDzALzMzMAAAAGzsMDmZmhZMzAYmCgZ2wQYMLDwYgFjZWAYGzMGDmBYmZGYA",
 							count = 2,
 							share = 0.333,
 						},
@@ -2458,8 +2458,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMzMmlxMjZGDzALzMzMAAAAGzsMDmZmx2MmZAMTBwMLYIMmtBYMwiZmBAzYmxYwMAzMDYA",
-							count = 3,
-							share = 0.5,
+							count = 2,
+							share = 0.333,
 						},
 					},
 				},
@@ -2882,8 +2882,8 @@ LoadoutPlannerBuiltin = {
 					builds = {
 						{
 							code = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbLjxMDjZmZmZGGbzYGbbzMzMzMjBjZ2GAAAAGMmFzyADYBsMMBmFMDzMAzYA",
-							count = 8,
-							share = 0.296,
+							count = 7,
+							share = 0.259,
 						},
 					},
 				},
@@ -2942,13 +2942,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Ruby Life Pools",
 					isAll = false,
-					samples = 18,
+					samples = 19,
 					cohort = "all",
 					builds = {
 						{
 							code = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbLjxMDjZmZmZGGbzYGbbzMzMzMjBjZ2GAAAAGMmFzyADYBsMMBmFMDzMAzYA",
 							count = 5,
-							share = 0.278,
+							share = 0.263,
 						},
 					},
 				},
@@ -2996,13 +2996,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "All dungeons",
 					isAll = true,
-					samples = 55,
+					samples = 56,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMGjZZbZMmhZAAAAgFzsBDYAzGTgZBAmlZmZMz2ipNmZMWmxMzDMjFLzMLDjZmFAgBAmZMMMA",
-							count = 9,
-							share = 0.164,
+							count = 10,
+							share = 0.179,
 						},
 					},
 				},
@@ -3087,13 +3087,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "The Blinding Vale",
 					isAll = false,
-					samples = 6,
+					samples = 7,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMGjZZZZMmhBAAAAsYmNYADY2YCMLAwsMzMjx2ipNmZMWmZmZMsMLGLzMjZmFAgZAwMjhhB",
 							count = 2,
-							share = 0.333,
+							share = 0.286,
 						},
 					},
 				},
@@ -3154,26 +3154,26 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Kings' Rest",
 					isAll = false,
-					samples = 12,
+					samples = 13,
 					cohort = "all",
 					builds = {
 						{
 							code = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmZmZmZGAAAAAAAAwGgNzYYDWgZYoBLAMbzYGjtlZsxMzGLzMzMjhxMAAzwYGMCMzgBjLA",
 							count = 2,
-							share = 0.167,
+							share = 0.154,
 						},
 					},
 				},
 				{
 					target = "Murder Row",
 					isAll = false,
-					samples = 20,
+					samples = 21,
 					cohort = "all",
 					builds = {
 						{
 							code = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAA2AsZGDbwCMDDNYBgZZGzYssYsxMz2YZmZmZMWYGAgZYMzwIwMDGMGA",
 							count = 3,
-							share = 0.15,
+							share = 0.143,
 						},
 					},
 				},
@@ -3234,13 +3234,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "All dungeons",
 					isAll = true,
-					samples = 62,
+					samples = 63,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsstMzMzMjZGjZgFYDmxiGbDgZgNmZGMbzMGNbLzMbmxswixMjhlZZAAAgZmBzMAwgZA",
 							count = 11,
-							share = 0.177,
+							share = 0.175,
 						},
 					},
 				},
@@ -3286,13 +3286,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Murder Row",
 					isAll = false,
-					samples = 9,
+					samples = 10,
 					cohort = "top10",
 					builds = {
 						{
 							code = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsstMzMzMjZmZMjhFYDmxiGbDgZgNMzgZbmxoZZZmZzMmNWMmZMsMLDAAAYmBzMAwgZA",
 							count = 1,
-							share = 0.111,
+							share = 0.1,
 						},
 					},
 				},
@@ -3801,13 +3801,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "The Blinding Vale",
 					isAll = false,
-					samples = 23,
+					samples = 24,
 					cohort = "all",
 					builds = {
 						{
 							code = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAwMLbGDzwyM2MmZMAAAAAAALLwEzMwMMYGMzMzwsNMjZWGW2stNbzYWAAgNAAAwsNLNzMzGDbAMzw0YADAYA",
 							count = 4,
-							share = 0.174,
+							share = 0.167,
 						},
 					},
 				},
@@ -3961,13 +3961,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Altar of Fangs",
 					isAll = false,
-					samples = 21,
+					samples = 22,
 					cohort = "all",
 					builds = {
 						{
 							code = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAghxyMLjZx2MmZsZsZZGzs9AzstsMzYhhmxMgBDYWmZmZY2wMMLzEAAAAAAsYbmtZbmJAAMAAzAGDsIjZA",
 							count = 4,
-							share = 0.19,
+							share = 0.182,
 						},
 					},
 				},
@@ -4026,13 +4026,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Temple of Sethraliss",
 					isAll = false,
-					samples = 16,
+					samples = 17,
 					cohort = "all",
 					builds = {
 						{
 							code = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAghxyMLjZx2MmZsZstsNjZ2Mz22yMjFmRzYGwgBDmZmZY2GmhZ5BmAAAAAAgFLzsMLzMBAgBAYGwYgFZMDA",
 							count = 2,
-							share = 0.125,
+							share = 0.118,
 						},
 					},
 				},
@@ -4052,13 +4052,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Voidscar Arena",
 					isAll = false,
-					samples = 17,
+					samples = 19,
 					cohort = "all",
 					builds = {
 						{
 							code = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBWmZZML2mxMz2mBmhZzMbLLzMWYMNjZAjxAGzMzMMbYGmlZCAAAAAAWsNz2sNzEAAgxAMDYAWkxMA",
 							count = 3,
-							share = 0.176,
+							share = 0.158,
 						},
 					},
 				},
@@ -4251,13 +4251,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Ruby Life Pools",
 					isAll = false,
-					samples = 31,
+					samples = 32,
 					cohort = "all",
 					builds = {
 						{
 							code = "CUkAAAAAAAAAAAAAAAAAAAAAAAAYMzMjhZkZmBWMjZwMjZGz8AzMzYYmZmx2YGjxMAAAAAAAAMzM2AAAAwAzMzMzSbzMzAgZAAAAMA",
 							count = 5,
-							share = 0.161,
+							share = 0.156,
 						},
 					},
 				},
@@ -4318,13 +4318,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Altar of Fangs",
 					isAll = false,
-					samples = 20,
+					samples = 21,
 					cohort = "all",
 					builds = {
 						{
 							code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzwMwYGjZaMzMNjZWmxMzMzYmZGwMzMGzMmZGYgxgFYZMasNAmBBbYGMzghB",
 							count = 4,
-							share = 0.2,
+							share = 0.19,
 						},
 					},
 				},
@@ -4383,13 +4383,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Temple of Sethraliss",
 					isAll = false,
-					samples = 19,
+					samples = 20,
 					cohort = "all",
 					builds = {
 						{
 							code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzwMwYGjZaMzMNjZWmxMzMzYmZGwMzMGzMmZGYgxgFYZMasNAmBBbYGMzghB",
 							count = 4,
-							share = 0.211,
+							share = 0.2,
 						},
 					},
 				},
@@ -4409,13 +4409,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Voidscar Arena",
 					isAll = false,
-					samples = 16,
+					samples = 18,
 					cohort = "all",
 					builds = {
 						{
 							code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzwMwYGjZaMzMNjZWmxMzMzYmZGwMzMGzMmZGYgxgFYZMasNAmBBbYGMzghB",
 							count = 5,
-							share = 0.313,
+							share = 0.278,
 						},
 					},
 				},
@@ -4766,13 +4766,13 @@ LoadoutPlannerBuiltin = {
 				{
 					target = "Voidscar Arena",
 					isAll = false,
-					samples = 27,
+					samples = 28,
 					cohort = "all",
 					builds = {
 						{
 							code = "CgcBAAAAAAAAAAAAAAAAAAAAAAAWmZmZmZGjxwMAAAAAAALGz2gZAAAAAAAAYGzw8AzMzMzMzMMz2MjxmsAAADwMmZmtZmpZZmlZmhZGA",
 							count = 3,
-							share = 0.111,
+							share = 0.107,
 						},
 					},
 				},
@@ -15158,8 +15158,8 @@ LoadoutPlannerBuiltin = {
 						builds = {
 							{
 								code = "C4DAAAAAAAAAAAAAAAAAAAAAAYGGLzMzswMDamZGAAAGAwMz0sssMDAgNAAAzMDbWmxMLzYMzMzMswMmZmBAYAAAGgZGwMAYYmZA",
-								count = 41,
-								share = 0.275,
+								count = 42,
+								share = 0.282,
 							},
 						},
 					},
@@ -15179,13 +15179,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 15,
+						samples = 18,
 						cohort = "all",
 						builds = {
 							{
 								code = "C4DAAAAAAAAAAAAAAAAAAAAAAYGGLzMzswMDamZGAAAGAwMz0sssMDAgNAAAzMDbWmxMLzYMzMzMswMmZmBAYAAAGgZGwMAYYmZA",
-								count = 4,
-								share = 0.267,
+								count = 6,
+								share = 0.333,
 							},
 						},
 					},
@@ -15448,8 +15448,8 @@ LoadoutPlannerBuiltin = {
 						builds = {
 							{
 								code = "CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMmZmYmZGzMzMziZmZMjZAAAgZmZWWmZaDAAAAAA2AYbbMzMDmthxMsAAAwMbAzADYGMMA",
-								count = 11,
-								share = 0.367,
+								count = 10,
+								share = 0.333,
 							},
 						},
 					},
@@ -15482,52 +15482,52 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 38,
+						samples = 39,
 						cohort = "all",
 						builds = {
 							{
 								code = "CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMmZmYmZGzMzMziZmZMjZAAAgZmZWWmZaDAAAAAA2AYbbMzMDmthxMsAAAwMbAzADYGMMA",
 								count = 7,
-								share = 0.184,
+								share = 0.179,
 							},
 						},
 					},
 					{
 						target = "Entombed Sentinels",
 						isAll = false,
-						samples = 36,
+						samples = 37,
 						cohort = "all",
 						builds = {
 							{
 								code = "CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMmZmYmZGjZMziZmZmZMDAAAMzMzyyMTbAAAAAAwGAbLjZmZgtZMzMsAAAwMbAzADYghB",
 								count = 6,
-								share = 0.167,
+								share = 0.162,
 							},
 						},
 					},
 					{
 						target = "The Lost Explorers",
 						isAll = false,
-						samples = 34,
+						samples = 35,
 						cohort = "all",
 						builds = {
 							{
 								code = "CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMmZmYmZGzMzMziZmZMjZAAAgZmZWWmZaDAAAAAA2AYbbMzMDmthxMsAAAwMbAzADYGMMA",
 								count = 6,
-								share = 0.176,
+								share = 0.171,
 							},
 						},
 					},
 					{
 						target = "Vashnik the Malignant",
 						isAll = false,
-						samples = 31,
+						samples = 32,
 						cohort = "all",
 						builds = {
 							{
 								code = "CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMmZmYmZGzMzMziZmZMjZAAAgZmZWWmZaDAAAAAA2AYbbMzMDmthxMsAAAwMbAzADYGMMA",
 								count = 6,
-								share = 0.194,
+								share = 0.188,
 							},
 						},
 					},
@@ -15588,13 +15588,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 94,
+						samples = 95,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAAw2MzMjZMzYxYmZYZwMLmpJGGzMDjZLDADYYDsxyMmZZ2mZmtGAAAgFAYzwYGzwMAAmZYGjhB",
-								count = 67,
-								share = 0.713,
+								count = 68,
+								share = 0.716,
 							},
 						},
 					},
@@ -15666,13 +15666,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Vashnik the Malignant",
 						isAll = false,
-						samples = 13,
+						samples = 14,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAAw2MzMjZMzYxYmZYZwMLmpJGGzMDjZLDADYYDsxyMmZZ2mZmtGAAAgFAYzwYGzwMAAmZYGjhB",
-								count = 6,
-								share = 0.462,
+								count = 7,
+								share = 0.5,
 							},
 						},
 					},
@@ -15759,13 +15759,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 7,
+						samples = 8,
 						cohort = "all",
 						builds = {
 							{
-								code = "CIEAAAAAAAAAAAAAAAAAAAAAAsNDzy8Az8AzMzM2WGjZZYZGDAwAAAAAAg0MjZGzMMmt2AwAAzgNAAAAYmZZbplZGL22YGAjxMMGAMzAgZGkxG",
+								code = "CIEAAAAAAAAAAAAAAAAAAAAAAsNzYWmZ8AzMzgtxwyY2mxAAMAAAAAAINzYmxMDjZrNAMAwMYDAAAAmZW2WaZmxitNmBwYMDjBAzMAYmBZsA",
 								count = 1,
-								share = 0.143,
+								share = 0.125,
 							},
 						},
 					},
@@ -15815,7 +15815,7 @@ LoadoutPlannerBuiltin = {
 						cohort = "top10",
 						builds = {
 							{
-								code = "CIEAAAAAAAAAAAAAAAAAAAAAAsNDzy8Az8AzMzM2WGjZZMGGAgBAAAAAApZGzMmZYMbtBgBGwMYDAAAAmZW2WaZmxitNmBwYMDjBAzMAYmBZsB",
+								code = "CIEAAAAAAAAAAAAAAAAAAAAAAsNzYWmZYGzM2WGDLzithBAYAAAAAAQamZxMmZGjZrNAMgBMYbAAgZm2mZWmBAYzyGzAgxMMGAgtZAmZAjN",
 								count = 1,
 								share = 0.2,
 							},
@@ -15878,13 +15878,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 106,
+						samples = 107,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAwoZbbmZWGzMzAAAAAAYmyYGmZsNmthZ2mxYMGmxCbAYWmtZmZrBAAAWAMAYMDDMjZmNgZmhxMGMA",
 								count = 25,
-								share = 0.236,
+								share = 0.234,
 							},
 						},
 					},
@@ -15904,13 +15904,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 10,
+						samples = 11,
 						cohort = "all",
 						builds = {
 							{
 								code = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAwoZbbmZWGzMzAAAAAAYmyYGmZsNmthZ2mxYMGmxCbAYWmtZmZrBAAAWAMAYMDDMjZmNgZmhxMGMA",
 								count = 2,
-								share = 0.2,
+								share = 0.182,
 							},
 						},
 					},
@@ -16023,13 +16023,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 107,
+						samples = 108,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzYmZGAAAghphZGzMWmZmZGMmZAAAAAMzyMDMhxy2ALgBMDTgZwGYmhx2ALzsNAzMAYGGA",
 								count = 24,
-								share = 0.224,
+								share = 0.222,
 							},
 						},
 					},
@@ -16075,13 +16075,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Entombed Sentinels",
 						isAll = false,
-						samples = 14,
+						samples = 15,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzYmZGAAAghphZGzMWmZmZGMmZAAAAAMzyMDMhxy2ALgBMDTgZwGYmhx2ALzsNAzMAYGGA",
 								count = 3,
-								share = 0.214,
+								share = 0.2,
 							},
 						},
 					},
@@ -16194,13 +16194,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 1,
+						samples = 2,
 						cohort = "all",
 						builds = {
 							{
 								code = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzwMz2yMzMzMmxMzMzMjZWmxYmxsZmZGAAIGLbDsAGwMMBmhNgZGGAAgZGGzywYwYA",
 								count = 1,
-								share = 1,
+								share = 0.5,
 							},
 						},
 					},
@@ -16450,8 +16450,8 @@ LoadoutPlannerBuiltin = {
 						builds = {
 							{
 								code = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwswMzMYYGjZWmZxMzYhlZWGjZGLYYAGbbzMYMbDgJAAAALmZmZGsZMjxMAAmZgBA",
-								count = 10,
-								share = 0.147,
+								count = 9,
+								share = 0.132,
 							},
 						},
 					},
@@ -16471,13 +16471,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 5,
+						samples = 7,
 						cohort = "all",
 						builds = {
 							{
 								code = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMLNjxMDwsMzMzMYYGjZWmZxMzYhlZWGjZGLYYAGbbzMYMbDgJAAAALMzMzgNDjxMAAmZgBA",
-								count = 1,
-								share = 0.2,
+								count = 2,
+								share = 0.286,
 							},
 						},
 					},
@@ -17051,13 +17051,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 5,
+						samples = 6,
 						cohort = "all",
 						builds = {
 							{
 								code = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMzMMbzMz0MLmZMzMAAAAAmhZmZmZMzYAAzMzMzAAAYgBmxiGLbA2GwGgZMAAAzMAGA",
 								count = 1,
-								share = 0.2,
+								share = 0.167,
 							},
 						},
 					},
@@ -17239,7 +17239,7 @@ LoadoutPlannerBuiltin = {
 						cohort = "top10",
 						builds = {
 							{
-								code = "CsPAAAAAAAAAAAAAAAAAAAAAAMAmZMzMzYY2mZmZmZxMjMjxYYmxgZmZmZmZmZAAAAAAAAAYMbDMgFwywEYsgZGzMDMAMMzAMgB",
+								code = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMMjZYY2mZmZmZxMjmZMGDzMGMzMzMzMzMDAAAAAAAAAjZbgBsAWGmAjFMzYmZgBghZGgZgB",
 								count = 1,
 								share = 0.2,
 							},
@@ -17315,13 +17315,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 85,
+						samples = 86,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMMjZGDz2MzMTz2MzYMjBAAAAAAAgZGGDAWmxMzmZGzMDYzsYYgBmNGasgBMDAjZmxMAzMjZMA",
 								count = 13,
-								share = 0.153,
+								share = 0.151,
 							},
 						},
 					},
@@ -17341,26 +17341,26 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 4,
+						samples = 6,
 						cohort = "all",
 						builds = {
 							{
 								code = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMDDz2MzMTjZmxYGDAAAAAAAAzDMMGAsMDzsZmxMzYgBmxiGLbA2GsBgZAMzMzMmBzMYmZMA",
 								count = 2,
-								share = 0.5,
+								share = 0.333,
 							},
 						},
 					},
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 13,
+						samples = 14,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmZMjxYY2mZmZa2MzYmZMAAAAAAAAMzwMDAWmxMzmZGzMjBGYGbassAYbwGAmBgxMzYGMzghxA",
 								count = 1,
-								share = 0.077,
+								share = 0.071,
 							},
 						},
 					},
@@ -17486,13 +17486,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 14,
+						samples = 16,
 						cohort = "all",
 						builds = {
 							{
 								code = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwMzsMzwMzMjZGMzYmhZGzYGbzMjZMDGaGAAAAAAAAMzYGgZ2AGmFw2AwA",
 								count = 2,
-								share = 0.143,
+								share = 0.125,
 							},
 						},
 					},
@@ -18027,13 +18027,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 74,
+						samples = 75,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAYBmZWGzMmZMMDzsMzYGAAAAzYWmBzMzwMMDgZqBwMbYIMmlBYMwiZmZBgZMGjhZGgZmZgB",
 								count = 24,
-								share = 0.324,
+								share = 0.32,
 							},
 						},
 					},
@@ -18053,13 +18053,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 10,
+						samples = 11,
 						cohort = "all",
 						builds = {
 							{
 								code = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAYBmZWGzMmZMMDzsMzYGAAAAzYWmBzMzwMMDgZqBwMbYIMmlBYMwiZmZBgZMGjhZGgZmZgB",
 								count = 5,
-								share = 0.5,
+								share = 0.455,
 							},
 						},
 					},
@@ -18594,13 +18594,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 31,
+						samples = 32,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMDDzMzMzw8AbzYGbbzMzMzMjBjZ2GAAAAGMmFzyADYBsMMBmFMDzMAzYA",
 								count = 15,
-								share = 0.484,
+								share = 0.469,
 							},
 						},
 					},
@@ -18646,12 +18646,12 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Entombed Sentinels",
 						isAll = false,
-						samples = 36,
+						samples = 38,
 						cohort = "all",
 						builds = {
 							{
 								code = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMDDzMzMzw8AbzYGbbzMzMzMjBjZ2GAAAAGMmFzyADYBsMMBmFMDzMAzYA",
-								count = 18,
+								count = 19,
 								share = 0.5,
 							},
 						},
@@ -18659,26 +18659,26 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "The Lost Explorers",
 						isAll = false,
-						samples = 29,
+						samples = 31,
 						cohort = "all",
 						builds = {
 							{
 								code = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMDDzMzMzw8AbzYGbbzMzMzMjBjZ2GAAAAGMmFzyADYBsMMBmFMDzMAzYA",
-								count = 13,
-								share = 0.448,
+								count = 14,
+								share = 0.452,
 							},
 						},
 					},
 					{
 						target = "Vashnik the Malignant",
 						isAll = false,
-						samples = 37,
+						samples = 39,
 						cohort = "all",
 						builds = {
 							{
 								code = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMDDzMzMzw8AbzYGbbzMzMzMjBjZ2GAAAAGMmFzyADYBsMMBmFMDzMAzYA",
-								count = 16,
-								share = 0.432,
+								count = 17,
+								share = 0.436,
 							},
 						},
 					},
@@ -18739,13 +18739,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 87,
+						samples = 88,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMmZmZZbZMMjBAAAAsYmNYADY2YCMLAwsMzMjx2iJMzsMWmZmZMsMLzYxMDzsMAgBAmZMMMA",
 								count = 16,
-								share = 0.184,
+								share = 0.182,
 							},
 						},
 					},
@@ -18817,13 +18817,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Vashnik the Malignant",
 						isAll = false,
-						samples = 12,
+						samples = 13,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMmZmZZbZMMjBAAAAsYmNYADY2YCMLAwsMzMjx2iJMzsMWmZmZMsMLzYxMDzsMAgBAmZMMMA",
 								count = 3,
-								share = 0.25,
+								share = 0.231,
 							},
 						},
 					},
@@ -19029,13 +19029,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 85,
+						samples = 86,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsssNjZGjZGzMDjFYDmxiGbDgZgNzwMYbMmpZbZmZzMmFWMPwMjZYWGAAAYmZwMDAMYG",
 								count = 33,
-								share = 0.388,
+								share = 0.384,
 							},
 						},
 					},
@@ -19055,13 +19055,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 10,
+						samples = 12,
 						cohort = "all",
 						builds = {
 							{
 								code = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsssNjZGjZGzMDjFYDmxiGbDgZgNzwMYbMmpZbZmZzMmFWMPwMjZYWGAAAYmZwMDAMYG",
 								count = 2,
-								share = 0.2,
+								share = 0.167,
 							},
 						},
 					},
@@ -19319,13 +19319,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 101,
+						samples = 102,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CoQAAAAAAAAAAAAAAAAAAAAAAYmxMzoZjZ2mZGzyAAAAAAAAGzYYBGYbYhGWMmZsMLzMzYGAYmxMzYmBwMjZAAAMmZmxwwyMGwA",
 								count = 19,
-								share = 0.188,
+								share = 0.186,
 							},
 						},
 					},
@@ -19345,13 +19345,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 11,
+						samples = 13,
 						cohort = "all",
 						builds = {
 							{
 								code = "CoQAAAAAAAAAAAAAAAAAAAAAAYmZMzoZjhZmxsMAAAAAAAgxMGWgB2GWohFjZGLzyMzMmBAmZMzMmZAmZGzMAAAjZmZmhhlZMgB",
 								count = 1,
-								share = 0.091,
+								share = 0.077,
 							},
 						},
 					},
@@ -19397,13 +19397,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Vashnik the Malignant",
 						isAll = false,
-						samples = 14,
+						samples = 15,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CoQAAAAAAAAAAAAAAAAAAAAAAsZGmZ0sZmZbmZmZbAAAAAAAAjZMsADsNsQDLGzMWmlZmZMDAMzYmZMzAMmxMAAAGzMzYYYZGDYA",
 								count = 1,
-								share = 0.071,
+								share = 0.067,
 							},
 						},
 					},
@@ -19780,13 +19780,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 3,
+						samples = 4,
 						cohort = "all",
 						builds = {
 							{
-								code = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMgxYZmZ2mBAAAAAAAAAAAYZYEmhhBMjhZmZGmthZYWmJAgFmNmxMzMDAgFzsMLjJAAwMGAzAMWGMxMzsZA",
-								count = 1,
-								share = 0.333,
+								code = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYw2MmhlZGbzAAAAAAAAAAAAsMMaGzwwAmxwMzMDz2wMMLzEAwiZ2mZYmZmBAwGAMLzSzMzsAgBmZAglBwA+A",
+								count = 2,
+								share = 0.5,
 							},
 						},
 					},
@@ -20070,13 +20070,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 5,
+						samples = 6,
 						cohort = "all",
 						builds = {
 							{
 								code = "CEkAAAAAAAAAAAAAAAAAAAAAAYgZmZ2MmZmxMzkxMDAAAAAAYWegxsNDzMz2MzYZmxMWmZYmlZ2mBDjlNmwYmxwCAAAAAAAYmBYAAAAYA",
 								count = 2,
-								share = 0.4,
+								share = 0.333,
 							},
 						},
 					},
@@ -20321,13 +20321,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 34,
+						samples = 35,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZwMDzwM8AGYMTjZmpZmx2MzMzMzMzMzAmZmxYmZZmZgBGD2glxox2AYGEshZwMDGeA",
 								count = 7,
-								share = 0.206,
+								share = 0.2,
 							},
 						},
 					},
@@ -20341,6 +20341,19 @@ LoadoutPlannerBuiltin = {
 								code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZwMDzYmBMYMTzMzMNzM2mZmZmZmZmZGwMmxYmZZmZgBGD2glxox2AYGEshBmZwwDA",
 								count = 1,
 								share = 0.2,
+							},
+						},
+					},
+					{
+						target = "Kith'ix",
+						isAll = false,
+						samples = 1,
+						cohort = "all",
+						builds = {
+							{
+								code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZwMDzwMgBjZaMzMNzM2mZmZmZmZmZGwMmZGzMbzMDMwYwGsMGN2GAzggNMDmZwwDA",
+								count = 1,
+								share = 1,
 							},
 						},
 					},
@@ -20360,13 +20373,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Entombed Sentinels",
 						isAll = false,
-						samples = 33,
+						samples = 34,
 						cohort = "all",
 						builds = {
 							{
 								code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzYmBMYMTjZmpZMWmxMzMz8AzMzAmxMzYmZZmZgBGDWglxox2AYGEshBmZwwA",
 								count = 6,
-								share = 0.182,
+								share = 0.176,
 							},
 						},
 					},
@@ -20479,13 +20492,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 2,
+						samples = 3,
 						cohort = "all",
 						builds = {
 							{
 								code = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMjFzMGMjZzwMzsNAAAmxMGMjZkZmBAAAYmZmMzMzYWmZGAMjZgFwCYGmAbwmhBwMzYA",
 								count = 1,
-								share = 0.5,
+								share = 0.333,
 							},
 						},
 					},
@@ -20730,13 +20743,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 58,
+						samples = 59,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2MmZmZmZmxwMAAAAAAAegxsNYGAAAAAAAAmxMMmZmZMzMzYmtZGjNttAAADwMmZmtZmpZbmlZmxMGA",
 								count = 14,
-								share = 0.241,
+								share = 0.237,
 							},
 						},
 					},
@@ -20756,13 +20769,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Kith'ix",
 						isAll = false,
-						samples = 11,
+						samples = 12,
 						cohort = "all",
 						builds = {
 							{
-								code = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2mxMzMzYmxwMAAAAAAALGz2gZAAAAAAAAYGzwMzMzMzMzMMziZMWkFmZmZ2abmZGADDAAPwYGGzA",
-								count = 3,
-								share = 0.273,
+								code = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2MmZmZmZmBmBAAAAAAY5BGz2gZAAAAAAAAYGzwMzMzMzMzMMziZMWkFmZmZ2abmZGADDAAPwYGGzA",
+								count = 4,
+								share = 0.333,
 							},
 						},
 					},
@@ -20795,13 +20808,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "The Lost Explorers",
 						isAll = false,
-						samples = 7,
+						samples = 8,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CgcBAAAAAAAAAAAAAAAAAAAAAAAWMmZmZmZmBmBAAAAAAY7BGz2gZAAAAAAAAYGzw8AzMzMzMzMjZ2mZM202CAAMAGzMz2Mz0sNzyMzYMDA",
 								count = 3,
-								share = 0.429,
+								share = 0.375,
 							},
 						},
 					},
@@ -21078,13 +21091,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 4,
+						samples = 5,
 						cohort = "all",
 						builds = {
 							{
-								code = "CIEAAAAAAAAAAAAAAAAAAAAAAsNzYWmZYGzM2WGDLzitZMAADAAAAAASzMMjZmxY2aDADAMD2GAAYmptZmlZAA2ssxMAYMDjBAYbGgZGwYD",
+								code = "CIEAAAAAAAAAAAAAAAAAAAAAAsNzYWmZ8AzMzgtxwyY2mxAAMAAAAAAINzYmxMDjZrNAMAwMYDAAAAmZW2WaZmxitNmBwYMDjBAzMAYmBZsA",
 								count = 1,
-								share = 0.25,
+								share = 0.2,
 							},
 						},
 					},
@@ -21132,13 +21145,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 18,
+						samples = 20,
 						cohort = "all",
 						builds = {
 							{
 								code = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAwoZbbmZWGzMzAAAAAAYmyYGmZsNmthZ2mxYMGmxCbAYWmtZmZrBAAAWAMgBMjZgZMzsBMzMMGGMA",
 								count = 3,
-								share = 0.167,
+								share = 0.15,
 							},
 						},
 					},
@@ -21199,13 +21212,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 21,
+						samples = 22,
 						cohort = "all",
 						builds = {
 							{
 								code = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzYmZGAAAghphZGzMWmZmZGMmZAAAAAMzyMDMhxy2ALgBMDTgZwGYmhx2ALzsNAzMAYGGA",
 								count = 9,
-								share = 0.429,
+								share = 0.409,
 							},
 						},
 					},
@@ -21348,13 +21361,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 13,
+						samples = 14,
 						cohort = "all",
 						builds = {
 							{
 								code = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMD8AmFzMzMYYGjZWmZxMzYjlZWGjZGLYYAGbbzMYMbDgJAAAALmZmZGsZgxMAAmZgBA",
 								count = 2,
-								share = 0.154,
+								share = 0.143,
 							},
 						},
 					},
@@ -21590,13 +21603,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 23,
+						samples = 24,
 						cohort = "all",
 						builds = {
 							{
 								code = "CoPAAAAAAAAAAAAAAAAAAAAAAwYWmZmxMmZMMLzMz0MLmZMmxAAAAAmZmZmZmZYGjBAjZmZGAAgxsNwAWALDTghFAzYGAAmZAGMA",
 								count = 4,
-								share = 0.174,
+								share = 0.167,
 							},
 						},
 					},
@@ -21711,13 +21724,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 15,
+						samples = 16,
 						cohort = "all",
 						builds = {
 							{
 								code = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmxMzMzMDz2MzMTDjxMzYAAAAAAAAYeghxAglZYmNzMmZGDMwMW0YZDw2gNAMDgZmZmxMYmBYMA",
 								count = 2,
-								share = 0.133,
+								share = 0.125,
 							},
 						},
 					},
@@ -21819,26 +21832,26 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 27,
-						cohort = "all",
+						samples = 5,
+						cohort = "top10",
 						builds = {
 							{
-								code = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMmxMLbzYmZMDeATzYwstZmZmZmZmZwMLDzMAAgxMzYAMjNGGgNmZbGD",
-								count = 6,
-								share = 0.222,
+								code = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMmxMLbzYmZMDeATzYwsttNzMzMzMzMYmlhZAAAGzMjBwM22gBYjZ2mxA",
+								count = 2,
+								share = 0.4,
 							},
 						},
 					},
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 10,
+						samples = 11,
 						cohort = "all",
 						builds = {
 							{
 								code = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMmxMLbzYmZMDeATzYwsttNzMzMzMzMYmlhZAAAGzMjBwM2YYA2YmtZMA",
 								count = 2,
-								share = 0.2,
+								share = 0.182,
 							},
 						},
 					},
@@ -22007,13 +22020,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 16,
+						samples = 17,
 						cohort = "all",
 						builds = {
 							{
 								code = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAYBmZWGzMmZMMDzsMzYGAAAAzYWmBzMzwMMDgZqBwMbYIMmlBYMwiZmZBgZMGjhZGgZmZgB",
 								count = 9,
-								share = 0.563,
+								share = 0.529,
 							},
 						},
 					},
@@ -22437,26 +22450,26 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "All bosses",
 						isAll = true,
-						samples = 14,
+						samples = 15,
 						cohort = "top10",
 						builds = {
 							{
 								code = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsstMmZmZMzMjhhFYBmxiGbDgZgNmZGMLzMzoZbZmhZMbsMjZGDmlZAAYAMzgZGAYwA",
 								count = 8,
-								share = 0.571,
+								share = 0.533,
 							},
 						},
 					},
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 19,
+						samples = 21,
 						cohort = "all",
 						builds = {
 							{
 								code = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsssNzMDjZGzMYsAbwMW0YbAMDsZGmBbzMmpZbZmhZmZhFzMzYwsMAAAwMzgZGAYwM",
 								count = 4,
-								share = 0.211,
+								share = 0.19,
 							},
 						},
 					},
@@ -22545,13 +22558,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 23,
+						samples = 26,
 						cohort = "all",
 						builds = {
 							{
 								code = "CoQAAAAAAAAAAAAAAAAAAAAAAYmxMzoZjZMzMzsMAAAAAAAgxMGWgB2GWohFjZGLzyMzMmBAmZMzMmZAMzYGAAAjZmZMMsMjBMA",
 								count = 3,
-								share = 0.13,
+								share = 0.115,
 							},
 						},
 					},
@@ -22653,13 +22666,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 13,
+						samples = 14,
 						cohort = "all",
 						builds = {
 							{
 								code = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYM2GGsMzMbzAAAAAAAAAAAAsMMaGzwwALzYYmZmhZbYGmFTAALmZbmZMmZGAALmZZWGTAAAjBwMAjlBiZmZzFA",
 								count = 3,
-								share = 0.231,
+								share = 0.214,
 							},
 						},
 					},
@@ -22787,13 +22800,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 14,
+						samples = 15,
 						cohort = "all",
 						builds = {
 							{
 								code = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZGzMzmxMzMmZmMmZAAAAAAAzyDMmtZYmBzMWmZMDzMGzyALziZMMbMNmZGDbAAAAAAAAMzgBAAAgB",
 								count = 4,
-								share = 0.286,
+								share = 0.267,
 							},
 						},
 					},
@@ -22921,13 +22934,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 12,
+						samples = 13,
 						cohort = "all",
 						builds = {
 							{
 								code = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZwMDzwMgBjZaMzMNzM2mZmZmZmZmZGwMzMzYmZbmZgBGD2glxox2AYGEshBmZwwDA",
 								count = 3,
-								share = 0.25,
+								share = 0.231,
 							},
 						},
 					},
@@ -22988,13 +23001,13 @@ LoadoutPlannerBuiltin = {
 					{
 						target = "Nek'zali the Soulcoiler",
 						isAll = false,
-						samples = 8,
+						samples = 9,
 						cohort = "all",
 						builds = {
 							{
 								code = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMDmZMYGzmhZmZbAAAMjZMYGzIzMDAAAwMzMZmZmxsMzMAYGzALgFwMMB2MsZYAMzMGA",
 								count = 3,
-								share = 0.375,
+								share = 0.333,
 							},
 						},
 					},
@@ -23110,11 +23123,11 @@ LoadoutPlannerBuiltin = {
 			},
 		},
 		stats = {
-			kept = 1745,
+			kept = 1746,
 			outOfSeason = 417,
 			unreadable = 0,
-			topCohort = 621,
-			fallback = 1124,
+			topCohort = 624,
+			fallback = 1122,
 		},
 	},
 }
